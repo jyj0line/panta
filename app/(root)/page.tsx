@@ -1,6 +1,6 @@
 const RootGroupPage = () => {
   return (
-    <div>root group page</div>
+    <div>root group page grid</div>
   )
 }
 
