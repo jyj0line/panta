@@ -41,9 +41,9 @@ const UserDiv = () => {
       <Image src={userProfileImage} alt='userDiv' onClick={toggleMenu} className='w-7 h-7 rounded-full cursor-pointer'></Image>
       <ArrowDropDown onClick={toggleMenu} className='w-auto h-9 cursor-pointer'></ArrowDropDown>
       {showUserMenu &&
-      <div className='flex flex-col justify-center absolute min-w-max right-0 top-full mt-2 shadow-lg'>
+      <div className='flex flex-col justify-center absolute min-w-max right-0 top-full mt-2 shadow-lg bg-background'>
         {userMenuItems.map(({ id, href }) => (
-        <Link key={id} href={href} className='px-4 py-2 text-md bg-white'>{id}</Link>
+        <Link key={id} href={href} className='px-4 py-2 text-md'>{id}</Link>
       ))}
       </div>
       }

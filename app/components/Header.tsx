@@ -19,8 +19,8 @@ const Header = () => {
             <UserDiv/>
             :
             <div className='flex justify-center items-center gap-x-2'>
-            <Link href='/' className='flex justify-center items-center h-9 p-4 rounded-full bg-green-100'>Login</Link>
-            <Link href='/' className='flex justify-center items-center h-9 p-4 rounded-full bg-green-100'>Sign Up</Link>
+                <Link href='/' className='flex justify-center items-center h-9 p-4 rounded-full bg-green-100'>Login</Link>
+                <Link href='/' className='flex justify-center items-center h-9 p-4 rounded-full bg-green-100'>Sign Up</Link>
             </div>
             }
       </header>

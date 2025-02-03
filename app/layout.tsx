@@ -7,7 +7,7 @@ const Layout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en" className={`text-[16px] ${inter.className} antialiased`}>
+    <html lang="en" className={`text-[16px] ${inter.className} antialiased bg-background text-foreground`}>
       <body className={`min-h-dvh`}>
         {children}
       </body>
