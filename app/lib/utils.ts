@@ -1,16 +1,7 @@
-const throttle = <T extends (...args: any[]) => any>
-  (func: T, limit: number): (...args: Parameters<T>) => void => {
-    let inThrottle: boolean = false;
+'use server'
+import bcrypt from 'bcrypt';
 
-    return (...args: Parameters<T>): void => {
-      if (!inThrottle) {
-        func(...args);
-        inThrottle = true;
-        setTimeout(() => {
-          inThrottle = false;
-        }, limit);
-      }
-    };
-  };
-
-  export {throttle};
+export const hashPassword = async (password: string) => {
+  'use server'
+  return bcrypt.hash(password, 10);
+};

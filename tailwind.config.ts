@@ -11,6 +11,20 @@ export default {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+
+        sub: 'var(--sub)'
+      },
+      gridTemplateColumns: {
+        'card-grid': 'repeat(auto-fit, minmax(18rem, auto))',
+      },
+      animation: {
+        shimmer: "shimmer 1.5s infinite linear",
+      },
+      keyframes: {
+        shimmer: {
+          "0%": { backgroundPosition: "-200px 0" },
+          "100%": { backgroundPosition: "200px 0" },
+        },
       },
     },
   },

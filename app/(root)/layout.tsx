@@ -6,9 +6,9 @@ const RootGroupLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className='relative'>
+    <div className='relative bg-neutral-100'>
       <RootGroupHT/>
-      <div className='container h-[1200px]'>
+      <div className='container'>
         {children}
       </div>
     </div>

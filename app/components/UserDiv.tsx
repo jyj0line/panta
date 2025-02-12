@@ -3,7 +3,7 @@ import {useState, useRef, useCallback, useEffect} from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import {ArrowDropDown} from '@/app/lib/svgs'
+import {ArrowDropDownSvg} from '@/app/lib/svgs'
 
 ///dummy
 const userId = '1'
@@ -39,7 +39,7 @@ const UserDiv = () => {
   return(
     <div ref={userDivRef} className='relative flex justify-center items-center gap-x-0.5 z-10'>
       <Image src={userProfileImage} alt='userDiv' onClick={toggleMenu} className='w-7 h-7 rounded-full cursor-pointer'></Image>
-      <ArrowDropDown onClick={toggleMenu} className='w-auto h-9 cursor-pointer'></ArrowDropDown>
+      <ArrowDropDownSvg onClick={toggleMenu} className='w-auto h-9 cursor-pointer'></ArrowDropDownSvg>
       {showUserMenu &&
       <div className='flex flex-col justify-center absolute min-w-max right-0 top-full mt-2 shadow-lg bg-background'>
         {userMenuItems.map(({ id, href }) => (

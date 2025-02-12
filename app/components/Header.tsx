@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import UserDiv from '@/app/components/UserDiv'
-import {Panta} from '@/app/lib/svgs'
+import {PantaSvg} from '@/app/lib/svgs'
 
 ///dummy
 const isLogined = true;
@@ -12,7 +12,7 @@ const Header = () => {
         <header className='flex justify-between items-center w-full px-1 pt-4 pb-1'>
             <div className='flex justify-center items-center'>
                 <Link href='/'>
-                    <Panta className='aspect-auto h-9'></Panta>
+                    <PantaSvg className='aspect-auto h-9'/>
                 </Link>
             </div>
             {isLogined?
