@@ -12,20 +12,14 @@ export default {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
 
-        sub: 'var(--sub)'
+        sub: 'var(--sub)',
+        supersub: 'var(--supersub)',
+
+        em: 'var(--em)'
       },
       gridTemplateColumns: {
         'card-grid': 'repeat(auto-fit, minmax(18rem, auto))',
-      },
-      animation: {
-        shimmer: "shimmer 1.5s infinite linear",
-      },
-      keyframes: {
-        shimmer: {
-          "0%": { backgroundPosition: "-200px 0" },
-          "100%": { backgroundPosition: "200px 0" },
-        },
-      },
+      }
     },
   },
   plugins: [],
