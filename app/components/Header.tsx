@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import UserDiv from '@/app/components/UserDiv'
+import { UserDiv } from '@/app/components/UserDiv'
 import {PantaSvg, SimpleSearchSvg} from '@/app/lib/svgs'
 
 ///dummy

@@ -3,7 +3,7 @@ import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 
 import { useToggleVisibility } from '@/app/lib/hooks'
 import { OrderCriteriaType } from '@/app/lib/sqls'
-import { ArrowDropDownSvg } from '@/app/lib/svgs'
+import { ArrowDropdownSvg } from '@/app/lib/svgs'
 
 const orderCriteria: OrderCriteriaType[] = [
   "rank", "created_at"
@@ -36,7 +36,7 @@ export const SearchCriticSelector = ({currentOrderCritic: currentCritic}: Search
     <div ref={ref} className='relative flex flex-col justify-center items-end w-[8rem]'>
       <div onClick={() => setIsVisible(prev => !prev)} className='flex flex-row justify-center items-center cursor-pointer'>
         <span className='text-[1rem]'>{currentCritic}</span>
-        <ArrowDropDownSvg className='w-[2rem] h-[2rem]'/>
+        <ArrowDropdownSvg className='w-[2rem] h-[2rem]'/>
       </div>
 
       {isVisible && (

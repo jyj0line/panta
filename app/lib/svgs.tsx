@@ -1,7 +1,11 @@
 import PantaSvg from '@/public/panta.svg'
 
-import ArrowDropDownSvg from '@/public/arrow_drop_down.svg'
-import ArrowDropUpSvg from '@/public/arrow_drop_up.svg'
+import SaveSvg from '@/public/save.svg'
+import CloseSvg from '@/public/close.svg'
+import SpinnerSvg from '@/public/spinner.svg'
+
+import ArrowDropdownSvg from '@/public/arrow_dropdown.svg'
+import ArrowDropupSvg from '@/public/arrow_dropup.svg'
 
 import FirstLeftSvg from '@/public/firstLeft.svg'
 import LeftSvg from '@/public/left.svg'
@@ -18,10 +22,12 @@ import ViewSvg from "@/public/view.svg"
 import EmptySvg from "@/public/empty.svg"
 import EndSvg from "@/public/end.svg"
 import ErrorSvg from "@/public/error.svg"
+import NotFoundSvg from '@/public/notFound.svg'
 
-export {PantaSvg,
-    ArrowDropUpSvg, ArrowDropDownSvg, FirstLeftSvg, LeftSvg, RightSvg, LastRightSvg,
+export {
+    PantaSvg, SaveSvg, CloseSvg, SpinnerSvg,
+    ArrowDropupSvg, ArrowDropdownSvg , FirstLeftSvg, LeftSvg, RightSvg, LastRightSvg,
     SimpleSearchSvg, DetailedSearchSvg, InfiniteScrollSvg, PaginationSvg,
     LikeSvg, ViewSvg,
-    EmptySvg, EndSvg, ErrorSvg
+    EmptySvg, EndSvg, ErrorSvg, NotFoundSvg
 }

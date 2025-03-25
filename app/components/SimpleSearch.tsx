@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import type { SearchedParamsType } from "@/app/lib/sqls"
 import { SearchCriticSelector } from '@/app/components/SearchCriticSelector';
 import { useDebounce } from '@/app/lib/hooks';
-import { DetailedSearchSvg, ArrowDropDownSvg } from '@/app/lib/svgs'
+import { DetailedSearchSvg, ArrowDropdownSvg } from '@/app/lib/svgs'
 
 type SimpleSearchProps = {
   onToggle: () => void,
@@ -41,7 +41,7 @@ export const SimpleSearch = ({ onToggle, p, searchedParams}: SimpleSearchProps) 
         <SearchCriticSelector currentOrderCritic={searchedParams.orderCritic}/>
         <div onClick={onToggle} className='flex flex-row items-center cursor-pointer'>
           <DetailedSearchSvg className="w-[2rem] h-[2rem]"/>
-          <ArrowDropDownSvg className="w-[1.5rem] h-[1.5rem]"/>
+          <ArrowDropdownSvg className="w-[1.5rem] h-[1.5rem]"/>
         </div>
       </div>
     </div>

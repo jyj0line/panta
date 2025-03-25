@@ -1,7 +1,8 @@
 import {Search} from '@/app/components/Search'
 import {InfiniteScrollSearchResults} from "@/app/components/InfiniteScrollSearchResults"
 import {PaginationSearchResults} from "@/app/components/PaginationSearchResults"
-import type { SearchedParamsType, OrderCriteriaType } from '@/app/lib/sqls'
+import type { SearchedParamsType } from '@/app/lib/sqls'
+import { getNaturalNumber, parseToken, parseString, parseDate, parseOrderCriteria } from '@/app/lib/utils'
 
 const SearchPage = async ({
   searchParams,
@@ -31,7 +32,7 @@ export type SearchedModeType = "simple" | "detailed" | null;
 export type SearchedStateType = {searchedMode: SearchedModeType, searchedParams:SearchedParamsType}
 export const getSearchedState = (searchParams: {[key: string]: string | string[] | undefined}): SearchedStateType => {
   const user = parseToken(searchParams.user);
-  const search = parseSearch(searchParams.search);
+  const search = parseString(searchParams.search);
   const tag = parseToken(searchParams.tag);
   const createdAtFrom = parseDate(searchParams.created_at_from);
   const createdAtTo = parseDate(searchParams.created_at_to);
@@ -43,33 +44,4 @@ export const getSearchedState = (searchParams: {[key: string]: string | string[]
   if (isDetailed) return { searchedMode: "detailed", searchedParams: searchedParams}
   if (isSimple) return {searchedMode: "simple", searchedParams: searchedParams};
   return {searchedMode: null, searchedParams: searchedParams};
-}
-
-const getNaturalNumber = (value: string | string[] | undefined): number | undefined => {
-  if (!value) return undefined;
-  const valueToCheck = Array.isArray(value) ? value[0] : value;
-  const num = Number(valueToCheck);
-  return Number.isInteger(num) && num > 0 ? num : undefined;
-};
-
-const parseToken = (value: string | string[] | undefined): string[] => {
-  if (!value || (Array.isArray(value) && value.length === 0)) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-export const parseSearch = (value: string | string[] | undefined): string | undefined => {
-  if (!value || value === "" || (Array.isArray(value) && value.length === 0)) return undefined;
-  return Array.isArray(value) ? value[0] : value;
-};
-
-const parseDate = (value: string | string[] | undefined): Date | undefined => {
-  if (!value || (Array.isArray(value) && value.length === 0))  return undefined;
-  const valueToCheck = Array.isArray(value) ? value[0] : value;
-  const timestamp = Date.parse(valueToCheck);
-  return isNaN(timestamp) ? undefined : new Date(timestamp)
-};
-
-const parseOrderCriteria = (value: string | string[] | undefined): OrderCriteriaType => {
-  if (value === "created_at") return value;
-  return "rank"
 }

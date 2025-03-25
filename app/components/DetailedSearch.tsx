@@ -3,8 +3,10 @@ import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { SearchCriticSelector } from '@/app/components/SearchCriticSelector';
+import { TokenInput } from '@/app/components/TokenInput';
+import { areSameArraies, isSameDate } from '@/app/lib/utils';
 import type { SearchedParamsType } from "@/app/lib/sqls"
-import { DetailedSearchSvg, ArrowDropUpSvg } from '@/app/lib/svgs'
+import { DetailedSearchSvg, ArrowDropupSvg } from '@/app/lib/svgs'
 
 type DetailedSearchProps = {
   onToggle: () => void,
@@ -26,9 +28,9 @@ export const DetailedSearch = ({onToggle, p, searchedParams}: DetailedSearchProp
   );
 
 
-  const sameUserIds = areEqualArraies(users, searchedParams?.user_ids || []);
+  const sameUserIds = areSameArraies(users, searchedParams?.user_ids || []);
   const sameSearch = (search || '') === (searchedParams?.search || '');
-  const sameTagIds = areEqualArraies(tags, searchedParams?.tag_ids || []);
+  const sameTagIds = areSameArraies(tags, searchedParams?.tag_ids || []);
   const sameFrom = isSameDate(createdAtFrom, searchedParams?.created_at_from)
   const sameTo = isSameDate(createdAtTo, searchedParams?.created_at_to)
   const isSearched = sameUserIds && sameSearch && sameTagIds && sameFrom && sameTo;
@@ -77,7 +79,7 @@ export const DetailedSearch = ({onToggle, p, searchedParams}: DetailedSearchProp
   return (
     <div className="flex flex-col gap-[0.5rem] w-[80%]">
       <span className="self-end p-[0.5rem] text-[1rem]">{isSearched ? "searched" : "not searched..."}</span>
-      <TokenInput tokens={users} setTokens={setUsers} type="user"/>
+      <TokenInput tokens={users} setTokens={setUsers} type="user" forSearch={true} />
       <input
         id='search'
         type="search"
@@ -86,7 +88,7 @@ export const DetailedSearch = ({onToggle, p, searchedParams}: DetailedSearchProp
         onChange={(e) => setSearch(e.target.value)}
         className="search"
       />
-      <TokenInput tokens={tags} setTokens={setTags} type="tag"/>
+      <TokenInput tokens={tags} setTokens={setTags} type="tag" forSearch={true} />
       <div className="flex flex-row justify-center items-center gap-[1rem]">
         <input id="created_at_from" type="date" className="search flex-1"
           value={createdAtFrom}
@@ -102,7 +104,7 @@ export const DetailedSearch = ({onToggle, p, searchedParams}: DetailedSearchProp
         <SearchCriticSelector currentOrderCritic={searchedParams.orderCritic}/>
         <div onClick={onToggle} className='flex flex-row items-center cursor-pointer'>
           <DetailedSearchSvg className="w-[2rem] h-[2rem]"/>
-          <ArrowDropUpSvg className="w-[1.5rem] h-[1.5rem]"/>
+          <ArrowDropupSvg className="w-[1.5rem] h-[1.5rem]"/>
         </div>
         <button onClick={() => handleDetailedSearch()}
           className="w-[5rem] h-[2.5rem] rounded-[0.5rem] text-[1rem] text-background bg-em"
@@ -111,85 +113,6 @@ export const DetailedSearch = ({onToggle, p, searchedParams}: DetailedSearchProp
         </button>
       </div>
     </div>
-  );
-};
-
-type TokenInputProps = {
-  tokens: string[];
-  setTokens: React.Dispatch<React.SetStateAction<string[]>>;
-  type: "user" | "tag"
-}
-const TokenInput = ({ tokens, setTokens, type }: TokenInputProps) => {
-  const typeClassName = type === 'tag'? 'border-em' : 'border-sub';
-
-  const [value, setValue] = useState("");
-  const addToken = () => {
-    const trimmedValue = value.trim();
-    if (trimmedValue && !tokens.includes(trimmedValue)) {
-      setTokens([...tokens, trimmedValue]);
-    }
-    setValue("");
-  };
-
-  const removeToken = (token: string) => {
-    setTokens(tokens.filter((t) => t !== token));
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === " " || e.key === "Tab" || e.key === "Enter") {
-      e.preventDefault();
-      addToken();
-    }
-  };
-
-  return (
-    <div className='flex flex-col gap-[0.5rem] w-full'>
-      {!!tokens.length &&
-      <div className="flex flex-row flex-wrap gap-[0.5rem] w-full">
-        {tokens.map((token) => (
-        <span
-          key={token}
-          className={`p-[0.5rem] rounded-[0.5rem] border-[0.1rem] ${typeClassName} cursor-pointer`}
-          onClick={() => removeToken(token)}
-        >
-          {token} ✕
-        </span>
-        ))}
-      </div>}
-      <input
-        type="search"
-        value={value}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        placeholder={type}
-        className="search"
-      />
-    </div>
-  );
-};
-
-const areEqualArraies = (array1: any[], array2: any[]): boolean => {
-  if (array1.length !== array2.length) {
-    return false;
-  }
-  return array1.every((value, index) => value === array2[index]);
-}
-
-const isSameDate = (value: string, date: Date | undefined): boolean => {
-  if (!value && !date) return true;
-
-  if (!value || !date) return false;
-
-  const [year, month, day] = value.split("-").map(Number);
-
-  return (
-    date.getFullYear() === year &&
-    date.getMonth() + 1 === month &&
-    date.getDate() === day
   );
 };
 

@@ -4,7 +4,7 @@
 
 @layer components {
     .container {
-        @apply md:w-[750px] lg:w-[1000px] xl:w-[1300px] mx-auto p-[0.5rem] pb-[0px] mb-[1rem];
+        @apply md:w-[750px] lg:w-[1000px] xl:w-[1300px] mx-auto;
     }
     .skeleton {
         @apply rounded-[0.25rem] bg-sub animate-pulse
@@ -14,6 +14,11 @@
         text-[1rem] placeholder:text-sub
         focus:outline outline-[0.05rem] outline-sub
     }
+    .textarea {
+        @apply p-[1rem] overflow-hidden placeholder:text-sub
+    }
+
+    
     
     .hide-scrollbar {
         scrollbar-width: none;
@@ -28,9 +33,17 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    outline: none;
+}
+
+textarea {
+    border: none;
+    resize: none;
 }
 
 :root {
+    --wh: #ffffff;
+    
     --background: #fafafa;
     --foreground: #0a0a0a;
 
@@ -38,4 +51,7 @@
     --supersub: #d4d4d4;
 
     --em: #22c55e;
+    --powerem: #166534;
+    --bad: #ef4444;
+    --powerbad: #991b1b;
 }

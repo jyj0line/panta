@@ -90,8 +90,9 @@ export const useToggleVisibility = (): UseToggleVisibilityReturnType => {
   useEffect(() => {
     if (isVisible) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
     }
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isVisible, handleClickOutside]);
   
   return { isVisible, setIsVisible, ref };

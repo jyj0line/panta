@@ -40,7 +40,7 @@ export const CardGrid = () => {
   if (!isLoading && !cards.length) return <Empty />;
   return (
     <>
-      <div className='relative grid gap-7 grid-cols-card-grid'>
+      <div className='relative grid grid-cols-card-grid gap-[0.5rem] p-[1rem]'>
       {cards.map((card) => 
         card ? <Card key={card.page_id} card={card} /> : null
       )}

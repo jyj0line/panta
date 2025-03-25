@@ -1,0 +1,31 @@
+export const COMMON = {
+    LIMIT_MAX: 100
+}
+
+export const USER = {
+    USER_ID_MIN: 1,
+    USER_ID_MAX: 32,
+    USER_HASHED_PASSWORD_LENGTH: 60
+}
+
+export const BOOK = {
+    BOOK_TITLE_MIN: 1,
+    BOOK_TITLE_MAX: 100
+}
+
+export const PAGE = {
+    PAGE_TITLE_MIN: 1,
+    PAGE_TITLE_MAX: 255,
+    PAGE_PREVIEW_MAX: 255,
+    PAGE_CONTENT_MAX: 100000,
+    PAGE_VIEW_MIN: 0,
+    PAGE_VIEW_MAX: 99999999,
+    PAGE_LIKE_MIN: 0,
+    PAGE_LIKE_MAX: 99999999
+}
+
+export const TAG = {
+    TAG_ID_MIN: 1,
+    TAG_ID_MAX: 25,
+    TAG_ID_NUM_MAX: 25 // not on the database
+}

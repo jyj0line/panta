@@ -1,7 +1,7 @@
 const UserIdDynamicPage = () => {
-    return (
-      <div>userId dynamic page</div>
-    )
-  }
+  return (
+    <div>userId dynamic page</div>
+  )
+}
   
-  export default UserIdDynamicPage;
+export default UserIdDynamicPage;
