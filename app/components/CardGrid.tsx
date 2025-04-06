@@ -5,11 +5,11 @@ import type { CardType } from '@/app/lib/sqls'
 import { sqlSelectCards } from '@/app/lib/sqls'
 import { Empty, End, Error} from '@/app/components/InformDataState'
 
-const SCROLL_OPTIONS: InfiniteScrollProps<{}, CardType | null> = {
+const SCROLL_OPTIONS: InfiniteScrollProps<Record<string, unknown>, CardType | null> = {
   selectItems: sqlSelectCards,
   request: {},
   chunkSize: 24,
-  initialOffset: 1,
+  initialChunk: 1,
   loadInitialData: true,
   onError: () => {
     console.error('Failed to load cards:');
@@ -26,8 +26,8 @@ export const CardGrid = () => {
     isLoading, 
     hasNextChunk, 
     loadMore, 
-    isError: error 
-  } = useInfiniteScroll<{}, CardType | null>(SCROLL_OPTIONS);
+    isError 
+  } = useInfiniteScroll<Record<string, unknown>, CardType | null>(SCROLL_OPTIONS);
 
   const targetRef = useIntersectionObserver({
     root: null,
@@ -40,14 +40,14 @@ export const CardGrid = () => {
   if (!isLoading && !cards.length) return <Empty />;
   return (
     <>
-      <div className='relative grid grid-cols-card-grid gap-[0.5rem] p-[1rem]'>
+      <div className='relative grid grid-cols-card-grid gap-[1rem] p-[1rem]'>
       {cards.map((card) => 
         card ? <Card key={card.page_id} card={card} /> : null
       )}
       {isLoading && loadingPlaceholders}
       </div>
       <div ref={targetRef}>{!isLoading && !hasNextChunk && <End />}</div>
-      {!isLoading && error && <Error />}
+      {!isLoading && isError && <Error />}
     </>
   );
 };

@@ -1,7 +1,7 @@
 import type { OrderCriteriaType } from '@/app/lib/sqls'
 
 // authentification & authorization
-export const getUserId = () => {
+export const getUserId = (): string => {
   return '0o0o0'
   //return 'hellohellohellohellohellohe'
 }
@@ -60,7 +60,7 @@ export const parseOrderCriteria = (value: string | string[] | undefined): OrderC
 
 
 
-export const areSameArraies = (array1: any[], array2: any[]): boolean => {
+export const areSameArraies = (array1: unknown[], array2: unknown[]): boolean => {
   if (array1.length !== array2.length) {
     return false;
   }

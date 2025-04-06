@@ -118,11 +118,12 @@ export const PaginationSearchResults = ({ p, searchedMode, searchedParams }: Pag
       <div className='self-center flex flex-row'>
         <PaginationArrow direction="firstLeft" href={generatePaginationURL({pathname, searchParams, p:1})} isDisabled={p <= 1} />
         <PaginationArrow direction="left" href={generatePaginationURL({pathname, searchParams, p:Math.min(p-1, 1)})} isDisabled={p <= 1} />
-        {paginationNumbers.map((pn, i) => { return <PaginationNumber
-          key={pn}
-          p={pn}
-          href={generatePaginationURL({pathname, searchParams, p:pn})}
-          isDisabled={p === pn}
+        {paginationNumbers.map((pn) => {
+          return <PaginationNumber
+            key={pn}
+            p={pn}
+            href={generatePaginationURL({pathname, searchParams, p:pn})}
+            isDisabled={p === pn}
         />})}
         <PaginationArrow direction="right" href={generatePaginationURL({pathname, searchParams, p:Math.min(p+1, totalP ?? p)})} isDisabled={p >= (totalP ?? p)} />
         <PaginationArrow direction="lastRight" href={generatePaginationURL({pathname, searchParams, p:totalP ?? p})} isDisabled={p >= (totalP ?? p)} />

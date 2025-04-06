@@ -1,11 +1,14 @@
 'use server'
 import { revalidatePath } from 'next/cache';
+import { AuthError } from 'next-auth';
 import { neon } from '@neondatabase/serverless';
 import { z } from "zod";
 
+import type { User } from 'next-auth';
+import { signIn, auth, signOut } from '@/auth';
 import type { ChunkedResponseType } from '@/app/lib/hooks';
 import { getUserId } from '@/app/lib/utils';
-import { COMMON, USER, BOOK, PAGE, TAG } from '@/app/lib/constants'
+import { COMMON, USER, BOOK, PAGE, TAG } from '@/app/lib/constants';
 
 // neon connection
 const getDatabaseConnection = async () => {
@@ -27,6 +30,38 @@ const OrderCriteriaSchema = z.enum(['rank', 'created_at'], { invalid_type_error:
 export type OrderCriteriaType = z.infer<typeof OrderCriteriaSchema>
 
 
+
+// authentification
+export const authenticate = async (
+  prevState: string | undefined,
+  formData: FormData,
+) => {
+  "use server"
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
+  }
+}
+
+export const signout = async (): Promise<void> => {
+  "use server"
+  await signOut({ redirectTo: '/' });
+}
+
+export const getUser = async (): Promise<User | undefined> => {
+  'use server'
+  const session = await auth();
+  return session?.user;
+}
 
 // tables
 
@@ -134,7 +169,7 @@ export const sqlSelectCards = async (chunkedRequest: ChunkedRequestType): Promis
     const cards = await sql`
       SELECT page_id, user_id, title, preview, view, "like", created_at
       FROM pages
-      ORDER BY view DESC
+      ORDER BY view DESC, page_id DESC
       OFFSET ${validatedOffset}
       LIMIT ${validatedLimit}
     `;
@@ -150,7 +185,7 @@ export const sqlSelectCards = async (chunkedRequest: ChunkedRequestType): Promis
       hasNextChunk: validatedCards.length === validatedLimit
     };
   } catch (error) {
-    console.error('Failed to fetch cards');
+    console.error('Failed to fetch cards', error);
     throw new Error('Failed to fetch cards');
   }
 };
@@ -262,7 +297,7 @@ export const sqlSelectSimpleSearch = async (chunkedRequestWithSearchParams: Chun
       totalCount: validatedTotalCount
     };
   } catch (error) {
-    console.error('Failed to fetch search results');
+    console.error('Failed to fetch search results', error);
     throw new Error('Failed to fetch search results');
   }
 }
@@ -415,7 +450,7 @@ export const sqlSelectWriteFormPage = async (pageId: PageType["page_id"]): Promi
 
     return SelectedWriteFormPageSchema.parse({...page[0]});
   } catch (error) {
-    console.error('Failed to fetch the write page');
+    console.error('Failed to fetch the write page', error);
     throw new Error('Failed to fetch the write page');
   }
 };
@@ -436,7 +471,7 @@ export const sqlSelectWriteFormBooks = async (): Promise<SelectWriteFormBooksTyp
 
     return SelectWriteFormBooksSchema.parse(books);
   } catch (error) {
-    console.error('Failed to fetch the write books');
+    console.error('Failed to fetch the write books', error);
     throw new Error('Failed to fetch the write books');
   }
 }
@@ -445,7 +480,8 @@ const parseTagIds = (tagIdsString: string): string[] => {
   try {
     const parsed = JSON.parse(tagIdsString);
     return Array.isArray(parsed) ? parsed.filter(tag => typeof tag === 'string') : [];
-  } catch (e) {
+  } catch (error) {
+    console.error('Failed to parse the tag ids.', error);
     return [];
   }
 }
@@ -462,7 +498,7 @@ const CreatePageFromWriteFormSchema = z.object({
   book_id: BookIdSchema
 });
 export type CreatePageFromWriteFormType = z.infer<typeof CreatePageFromWriteFormSchema>;
-export const sqlCreatePageFromWriteForm = async (auth: any, prevState: WriteFormStateType, formData: FormData): Promise<WriteFormStateType> => {
+export const sqlCreatePageFromWriteForm = async (auth: unknown, prevState: WriteFormStateType, formData: FormData): Promise<WriteFormStateType> => {
   'use server'
   try{
     const validatedFormData = CreatePageFromWriteFormSchema.safeParse({
@@ -535,7 +571,7 @@ const UpdatePageFromWriteFormSchema = z.object({
   book_id: BookIdSchema
 });
 export type UpdatePageFromWriteFormType = z.infer<typeof UpdatePageFromWriteFormSchema>;
-export const sqlUpdatePageFromWriteForm = async (auth: any, prevState: WriteFormStateType, formData: FormData): Promise<WriteFormStateType> => {
+export const sqlUpdatePageFromWriteForm = async (auth: unknown, prevState: WriteFormStateType, formData: FormData): Promise<WriteFormStateType> => {
   'use server'
   try {
     const validatedFormData = UpdatePageFromWriteFormSchema.safeParse({
@@ -595,3 +631,57 @@ export const sqlUpdatePageFromWriteForm = async (auth: any, prevState: WriteForm
     };
   }
 }
+
+
+
+
+
+// page page
+const SelectePageSchema = z.object({
+  ...PageSchema.pick({
+    user_id: true,
+
+    page_id: true,
+    title: true,
+    preview: true,
+    content: true,
+    view: true,
+    like: true,
+    created_at: true,
+
+    book_id: true,
+  }).shape,
+  book_title: BookSchema.shape.book_title,
+
+  tag_ids: TagsSchema.shape.tag_ids
+});
+export type SelectePageType = z.infer<typeof SelectePageSchema>;
+export const sqlSelectPage = async (pageId: PageType["page_id"]): Promise<SelectePageType> => {
+  'use server';
+  try {
+    const page = await sql`
+      WITH updated_page AS (
+        UPDATE pages
+        SET view = view + 1
+        WHERE page_id = ${pageId}
+        RETURNING *
+      )
+      SELECT user_id, page_id, title, preview, content, view, "like", created_at::TIMESTAMP AS created_at, book_id,
+      CASE 
+        WHEN updated_page.book_id IS NOT NULL THEN (SELECT books.book_title FROM books WHERE updated_page.book_id = books.book_id)
+        ELSE NULL
+      END AS book_title,
+        COALESCE((SELECT array_agg(pt.tag_id) FROM pages_tags pt WHERE pt.page_id = updated_page.page_id), ARRAY[]::TEXT[]) AS tag_ids
+      FROM updated_page
+    `;
+
+    if (page.length !== 1) {
+      throw new Error("can't find the page");
+    }
+
+    return SelectePageSchema.parse({...page[0]});
+  } catch (error) {
+    console.error('Failed to fetch the page', error);
+    throw new Error('Failed to fetch the page');
+  }
+};

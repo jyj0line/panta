@@ -6,6 +6,9 @@
     .container {
         @apply md:w-[750px] lg:w-[1000px] xl:w-[1300px] mx-auto;
     }
+    .little_container {
+        @apply md:w-[750px] lg:w-[1000px] mx-auto;
+    }
     .skeleton {
         @apply rounded-[0.25rem] bg-sub animate-pulse
     }
@@ -45,6 +48,7 @@ textarea {
     --wh: #ffffff;
     
     --background: #fafafa;
+    --powerbackground: #f5f5f5;
     --foreground: #0a0a0a;
 
     --sub: #737373;

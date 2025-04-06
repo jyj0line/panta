@@ -5,7 +5,9 @@ export const COMMON = {
 export const USER = {
     USER_ID_MIN: 1,
     USER_ID_MAX: 32,
-    USER_HASHED_PASSWORD_LENGTH: 60
+    USER_HASHED_PASSWORD_LENGTH: 60,
+    USER_UNHASHED_PASSWORD_MIN: 6,
+    USER_UNHASHED_PASSWORD_MAX: 60
 }
 
 export const BOOK = {

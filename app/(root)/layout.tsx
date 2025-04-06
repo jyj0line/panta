@@ -1,4 +1,4 @@
-import RootGroupHT from '@/app/components/RootGroupHT'
+import { RootGroupHeaderWithTabBar } from '@/app/components/RootGroupHeaderWithTabBar'
 
 const RootGroupLayout = ({
   children,
@@ -6,8 +6,8 @@ const RootGroupLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className='relative bg-neutral-100'>
-      <RootGroupHT/>
+    <div className='relative bg-powerbackground'>
+      <RootGroupHeaderWithTabBar/>
       <div className='container'>
         {children}
       </div>

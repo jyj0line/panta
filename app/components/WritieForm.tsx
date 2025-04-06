@@ -41,14 +41,18 @@ export const WriteForm = ({ page, books, isUpdate }: WriteFormProps) => {
     }
   };
   const handleExit = (): void => {
-    isUpdate ? push(`/${page.user_id}/${page.page_id}`) : push(`/${page.user_id}`)
+    if (isUpdate) {
+      push(`/${page.user_id}/${page.page_id}`);
+    } else {
+      push(`/${page.user_id}`);
+    }
   };
 
   useEffect(() => {
     if (!page.page_id && state?.page_id) {
       push(`/write?page_id=${state.page_id}`);
     }
-  }, [page.page_id, state?.page_id]);
+  }, [page.page_id, state?.page_id, push]);
 
   return (
     <form ref={formRef} action={formAction} className='container relative flex flex-col min-h-dvh'>

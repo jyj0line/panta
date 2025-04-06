@@ -1,9 +1,8 @@
 'use client'
-
-import Header from '@/app/components/Header'
+import { Header } from '@/app/components/Header'
 import { useIsVisibleAndIsSticky } from '@/app/lib/hooks'
 
-export const SearchH = () => {
+export const SearchHeader = () => {
   const { isVisible, isSticky } = useIsVisibleAndIsSticky({threshold: 100, throttleTime: 50});
   
   return (

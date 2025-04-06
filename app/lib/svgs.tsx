@@ -1,4 +1,5 @@
 import PantaSvg from '@/public/panta.svg'
+import SmallPantaSvg from '@/public/smallPanta.svg'
 
 import SaveSvg from '@/public/save.svg'
 import CloseSvg from '@/public/close.svg'
@@ -25,7 +26,7 @@ import ErrorSvg from "@/public/error.svg"
 import NotFoundSvg from '@/public/notFound.svg'
 
 export {
-    PantaSvg, SaveSvg, CloseSvg, SpinnerSvg,
+    PantaSvg, SmallPantaSvg, SaveSvg, CloseSvg, SpinnerSvg,
     ArrowDropupSvg, ArrowDropdownSvg , FirstLeftSvg, LeftSvg, RightSvg, LastRightSvg,
     SimpleSearchSvg, DetailedSearchSvg, InfiniteScrollSvg, PaginationSvg,
     LikeSvg, ViewSvg,

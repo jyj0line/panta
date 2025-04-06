@@ -4,7 +4,7 @@ import type { RefObject, SetStateAction  } from 'react';
 import type { ChunkedRequestType } from '@/app/lib/sqls';
 
 //useThrottle
-export const useThrottle = <T extends (...args: any[]) => any>(
+export const useThrottle = <T extends (...args: any[]) => void>(
   callback: T,
   delay: number
 ) => {
@@ -23,7 +23,7 @@ export const useThrottle = <T extends (...args: any[]) => any>(
 }
 
 //useDebounce
-export const useDebounce = <T extends (...args: any[]) => any>(
+export const useDebounce = <T extends (...args: any[]) => void>(
   callback: T,
   wait: number,
   leading?: boolean,
@@ -161,7 +161,7 @@ export const useIntersectionObserver = ({
     return () => {
       observer.disconnect();
     };
-  }, [targetRef.current, enabled]);
+  }, [enabled, onIntersect, root, rootMargin, threshold]);
 
   return targetRef;
 };
@@ -172,12 +172,12 @@ export type ChunkedResponseType<T> = {
   hasNextChunk: boolean;
   totalCount?: number;
 }
-export type InfiniteScrollProps<TRequest extends Record<string, any>, TResponse> = {
+export type InfiniteScrollProps<TRequest extends Record<string, unknown>, TResponse> = {
     selectItems: (chunkedRequest: ChunkedRequestType & TRequest) => Promise<ChunkedResponseType<TResponse>>;
     request: TRequest;
     chunkSize: number;
 
-    initialOffset: number;
+    initialChunk: number;
     loadInitialData: boolean;
 
     onError: () => void;
@@ -192,10 +192,10 @@ export type InfiniteScrollReturn<TResponse> = {
 
     loadMore: () => Promise<void>;
 
-    currentOffset: number;
+    currentChunk: number;
     reset: () => void;
 }
-export const useInfiniteScroll = <TRequest extends Record<string, any>, TResponse>(
+export const useInfiniteScroll = <TRequest extends Record<string, unknown>, TResponse>(
   props: InfiniteScrollProps<TRequest, TResponse>
   ): InfiniteScrollReturn<TResponse> => {
     const {
@@ -203,7 +203,7 @@ export const useInfiniteScroll = <TRequest extends Record<string, any>, TRespons
       request,
       chunkSize,
 
-      initialOffset,
+      initialChunk,
       loadInitialData,
 
       onError
@@ -214,16 +214,16 @@ export const useInfiniteScroll = <TRequest extends Record<string, any>, TRespons
     const [totalCount, setTotalCount] = useState<number | undefined>(undefined);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
 
     const latestRequestIdRef = useRef<number>(0);
     const prevRequestRef = useRef<TRequest>(request);
 
-    const [currentOffset, setCurrentOffset] = useState(initialOffset);
+    const [currentChunk, setCurrentChunk] = useState(initialChunk);
 
     const loadItems = async (offset: number): Promise<void> => {
       setIsLoading(true);
-      setError(false);
+      setIsError(false);
 
       const requestId = ++latestRequestIdRef.current;
   
@@ -235,18 +235,18 @@ export const useInfiniteScroll = <TRequest extends Record<string, any>, TRespons
         }
 
         setItems(prevItems => 
-          offset === initialOffset 
+          offset === initialChunk 
             ? response.items 
             : [...prevItems, ...response.items]
         );
         
         setHasNextChunk(response.hasNextChunk);
         setTotalCount(response?.totalCount);
-        setCurrentOffset(offset + 1);
+        setCurrentChunk(offset + 1);
       } catch (error) {
         console.error(`Request error (requestId: ${requestId}):`, error);
         if (requestId === latestRequestIdRef.current) {
-          setError(true);
+          setIsError(true);
           onError();
         }
       } finally {
@@ -255,7 +255,24 @@ export const useInfiniteScroll = <TRequest extends Record<string, any>, TRespons
         }
       }
     };
-  
+
+    const loadMore = async () => {
+      if (isLoading || !hasNextChunk) return;
+      await loadItems(currentChunk);
+    };
+
+    const reset = () => {
+      setItems([]);
+      setHasNextChunk(true);
+      setTotalCount(undefined);
+
+      setIsError(false)
+
+      setCurrentChunk(initialChunk);
+
+      loadItems(initialChunk);
+    };
+    
     useEffect(() => {
       if (JSON.stringify(prevRequestRef.current) != JSON.stringify(request)) {
         prevRequestRef.current = request;
@@ -264,7 +281,7 @@ export const useInfiniteScroll = <TRequest extends Record<string, any>, TRespons
       }
 
       if (loadInitialData) {
-        loadItems(initialOffset);
+        loadItems(initialChunk);
       } else {
         setIsLoading(false);
       }
@@ -272,24 +289,7 @@ export const useInfiniteScroll = <TRequest extends Record<string, any>, TRespons
       return () => {
         latestRequestIdRef.current = 0;
       };
-    }, [loadInitialData, initialOffset, request]);
-  
-    const loadMore = async () => {
-      if (isLoading || !hasNextChunk) return;
-      await loadItems(currentOffset);
-    };
-  
-    const reset = () => {
-      setItems([]);
-      setHasNextChunk(true);
-      setTotalCount(undefined);
-
-      setError(false)
-
-      setCurrentOffset(initialOffset);
-
-      loadItems(initialOffset);
-    };
+    }, [loadInitialData, initialChunk, request]);
   
     return {
       items,
@@ -297,9 +297,9 @@ export const useInfiniteScroll = <TRequest extends Record<string, any>, TRespons
       totalCount,
 
       isLoading,
-      isError: error,
+      isError,
 
-      currentOffset,
+      currentChunk,
 
       loadMore,
       reset,

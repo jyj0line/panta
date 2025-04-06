@@ -19,7 +19,7 @@ export const TabBar = () => {
       {tabs.map(({id, href}) => (
         <Link key={id} href={href}
         className={
-          `relative flex h-14 items-center justify-center gap-2 rounded-md px-3 text-md font-medium text-neutral-500' +
+          `relative flex h-14 items-center justify-center gap-2 rounded-md px-3 text-md font-medium text-sub' +
           ${activePath === href
             ? 'text-foreground after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[0.25rem] after:bg-foreground after:rounded-full'
             : ''}

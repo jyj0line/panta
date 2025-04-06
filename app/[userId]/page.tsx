@@ -1,7 +1,14 @@
-const UserIdDynamicPage = () => {
+const UserIdDynamicPage = async ({
+  params,
+}: {
+  params: Promise<{ userId: string; }>
+}) => {
+  const { userId } = await params;
+
   return (
-    <div>userId dynamic page</div>
+    <div className="">
+      { userId }
+    </div>
   )
 }
-  
 export default UserIdDynamicPage;

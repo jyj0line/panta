@@ -12,6 +12,7 @@ export default {
         wh: 'var(--wh)',
         
         background: 'var(--background)',
+        powerbackground: 'var(--powerbackground)',
         foreground: 'var(--foreground)',
 
         sub: 'var(--sub)',

@@ -1,5 +1,17 @@
+import type { Metadata } from 'next';
+
 import "@/app/globals.css";
 import { inter } from '@/app/lib/fonts';
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Panta',
+    default: 'Panta',
+  },
+  description: 'Page and Tag.',
+  //metadataBase: new URL('https://panta.com'),
+  applicationName: 'Panta',
+};
 
 const Layout = ({
   children,
