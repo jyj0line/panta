@@ -1,4 +1,4 @@
-import {SearchHeader} from '@/app/components/SearchHeader'
+import {SearchHeader} from '@/app/components/common/SCtxedUCtxedStickyHeader'
 
 const SearchLayout = ({ children }: Readonly<{children: React.ReactNode}>) => {
 

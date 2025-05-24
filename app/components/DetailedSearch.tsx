@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { SearchCriticSelector } from '@/app/components/SearchCriticSelector';
-import { TokenInput } from '@/app/components/TokenInput';
+import { TokenInput } from '@/app/components/leaves/TokenInput';
 import { areSameArraies, isSameDate } from '@/app/lib/utils';
 import type { SearchedParamsType } from "@/app/lib/sqls"
 import { DetailedSearchSvg, ArrowDropupSvg } from '@/app/lib/svgs'

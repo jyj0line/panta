@@ -1,27 +1,50 @@
+import type { UnhashedPassword } from "@/app/lib/tables";
+import { UserSchema, UnhashedPasswordSchema } from "@/app/lib/tables";
 import type { OrderCriteriaType } from '@/app/lib/sqls'
 
-// authentification & authorization
-export const getUserId = (): string => {
-  return '0o0o0'
-  //return 'hellohellohellohellohellohe'
+import { ERROR } from "@/app/lib/constants";
+import { z } from "zod";
+const {
+  UNHASHED_PASSWORD_FOR_CONFIRM_DIFF_ERROR: UNHASHED_PASSWORD_FOR_CONFIRM_DIFF,
+  DELETE_ACCOUNT_UNCHECKED_ERROR
+} = ERROR;
+
+export const validateUnhashedPassword = (unhashedPassword: UnhashedPassword): string[] => {
+  const parsedUnhashedPassword = UnhashedPasswordSchema.safeParse(unhashedPassword);
+  if (!parsedUnhashedPassword.success) {
+    return parsedUnhashedPassword.error.errors.map(e => e.message);
+  }
+
+  return [];
 }
 
+export const validateUnhashedPasswordForConfirm = (unhashedPassword: UnhashedPassword, unhashedPasswordForConfirm: UnhashedPassword): string[] => {
+  const isSame = unhashedPassword === unhashedPasswordForConfirm;
+  if (!isSame) {
+    return [UNHASHED_PASSWORD_FOR_CONFIRM_DIFF];
+  }
 
+  return [];
+}
 
+export const validateIsChecked = (isChecked: boolean, uncheckedMessage: string[]): string[] => {
+  if (!isChecked) {
+    return uncheckedMessage;
+  }
 
-/*
-import bcrypt from 'bcrypt';
+  return [];
+}
 
-export const hashPassword = async (password: string) => {
+const BioSchema = UserSchema.shape.bio;
+type Bio = z.infer<typeof UserSchema.shape.bio>;
+export const validateBio = (bio: Bio): string[] => {
+  const parsedBio = BioSchema.safeParse(bio);
+  if (!parsedBio.success) {
+    return parsedBio.error.errors.map(e => e.message);
+  }
 
-  'use server'
-  return bcrypt.hash(password, 10);
-};
-*/
-
-
-
-
+  return [];
+}
 
 export const getNaturalNumber = (value: string | string[] | undefined): number | undefined => {
   if (!value) return undefined;

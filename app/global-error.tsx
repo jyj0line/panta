@@ -1,5 +1,10 @@
 'use client';
+
 import { useEffect } from 'react';
+
+import "@/app/globals.css";
+import { inter } from '@/app/lib/fonts';
+import { Error } from "@/app/components/leaves/Error";
 
 const GlobalError = ({
   error,
@@ -13,17 +18,9 @@ const GlobalError = ({
   }, [error]);
 
   return (
-    <html>
-      <body className="flex justify-center items-center min-h-dvh">
-        <h2 className="p-[1rem]">
-          Something went wrong!
-        </h2>
-        <button
-          onClick={() => reset()}
-          className="px-[1.5rem] py-[1rem] rounded-[0.5rem] text-background bg-em"
-        >
-          Try again
-        </button>
+    <html lang="en">
+      <body className={`min-h-dvh text-[16px] ${inter.className} antialiased bg-background text-foreground`}>
+        <Error reset={reset} />
       </body>
     </html>
   )

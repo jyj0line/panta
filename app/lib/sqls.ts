@@ -1,24 +1,17 @@
 'use server'
 import { revalidatePath } from 'next/cache';
-import { AuthError } from 'next-auth';
-import { neon } from '@neondatabase/serverless';
 import { z } from "zod";
 
-import type { User } from 'next-auth';
-import { signIn, auth, signOut } from '@/auth';
+import { sql } from "@/app/lib/SFs/publicSFs";
 import type { ChunkedResponseType } from '@/app/lib/hooks';
-import { getUserId } from '@/app/lib/utils';
+
 import { COMMON, USER, BOOK, PAGE, TAG } from '@/app/lib/constants';
 
-// neon connection
-const getDatabaseConnection = async () => {
-    'use server';
-    if (!process.env.DATABASE_URL) {
-      throw new Error('DATABASE_URL is not set.');
-    }
-    return neon(process.env.DATABASE_URL);
-};
-const sql = await getDatabaseConnection();
+export const getUserId = async () => {
+  return '0o0o0'
+  //return 'hellohellohellohellohellohe'
+}
+
 
 // common constants
 const { LIMIT_MAX } = COMMON; 
@@ -29,47 +22,18 @@ const NonnegativeNumberSchema = z.number().int().nonnegative({ message: 'Please 
 const OrderCriteriaSchema = z.enum(['rank', 'created_at'], { invalid_type_error: 'Please select an order critic.' });
 export type OrderCriteriaType = z.infer<typeof OrderCriteriaSchema>
 
-
-
-// authentification
-export const authenticate = async (
-  prevState: string | undefined,
-  formData: FormData,
-) => {
-  "use server"
-  try {
-    await signIn('credentials', formData);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
-        default:
-          return 'Something went wrong.';
-      }
-    }
-    throw error;
-  }
-}
-
-export const signout = async (): Promise<void> => {
-  "use server"
-  await signOut({ redirectTo: '/' });
-}
-
-export const getUser = async (): Promise<User | undefined> => {
-  'use server'
-  const session = await auth();
-  return session?.user;
-}
-
-// tables
-
 // users table
-const {USER_ID_MIN, USER_ID_MAX, USER_HASHED_PASSWORD_LENGTH} = USER;
+const {USER_ID_MIN, USER_ID_MAX, USER_HASHED_PASSWORD_LENGTH, USER_BIO_MAX} = USER;
 const UserSchema = z.object({
-  user_id: z.string().min(USER_ID_MIN).max(USER_ID_MAX),
-  hashed_password: z.string().length(USER_HASHED_PASSWORD_LENGTH),
+  user_id:
+    z.string()
+    .min(USER_ID_MIN, { message: `User ID must be at least ${USER_ID_MIN} characters long.`})
+    .max(USER_ID_MAX, { message: `User ID must be no more than ${USER_ID_MAX} characters long.`}),
+  hashed_password:
+    z.string()
+    .length(USER_HASHED_PASSWORD_LENGTH, { message: `Hashed password must be ${USER_HASHED_PASSWORD_LENGTH} characters long.`}),
+  profile_image_url: z.string().nullable(),
+  bio: z.string().max(USER_BIO_MAX, { message: `Please enter a bio that is ${USER_BIO_MAX} or more in length.` }),
   created_at: z.date() // default current_timestamp
 });
 export type UserType = z.infer<typeof UserSchema>;
@@ -131,12 +95,23 @@ export type TagsType = z.infer<typeof TagsSchema>;
 // pages_tags table
 const PageTagSchema = z.object({
   page_id: PageSchema.shape.page_id,
-  tag_id: TagSchema.shape.tag_id 
+  tag_id: TagSchema.shape.tag_id
 });
 export type PageTageType = z.infer<typeof PageTagSchema>;
 
+// like table
+const LikeSchema = z.object({
+  user_id: UserSchema.shape.user_id,
+  page_id: PageSchema.shape.page_id,
+  created_at: z.date() // default current_timestamp
+})
 
-
+// follow table
+const FollowSchema = z.object({
+  follower_user_id: UserSchema.shape.user_id,
+  following_user_id: UserSchema.shape.user_id,
+  created_at: z.date() // default current_timestamp
+})
 
 // chunkedRequest
 const ChunkedRequestSchema = z.object({
@@ -396,239 +371,6 @@ export const sqlSelectDetailedSearch = async (chunkedRequestWithSearchParams: Ch
   } catch (error) {
     console.error('Failed to fetch search results', error);
     throw new Error('Failed to fetch search results');
-  }
-}
-
-
-
-
-
-// write
-export type WriteFormStateType = {
-  success?: boolean;
-  message?: string;
-  errors?: {
-    title?: string[];
-    preview?: string[];
-    tag_ids?: string[];
-    content?: string[];
-    book_id?: string[];
-  };
-  page_id?: PageType["page_id"]
-};
-
-const SelectedWriteFormPageSchema = z.object({
-  ...PageSchema.pick({
-    user_id: true,
-
-    page_id: true,
-    title: true,
-    preview: true,
-    content: true,
-
-    book_id: true,
-  }).shape,
-  tag_ids: TagsSchema.shape.tag_ids
-});
-export type SelectedWriteFormPageType = z.infer<typeof SelectedWriteFormPageSchema>;
-export const sqlSelectWriteFormPage = async (pageId: PageType["page_id"]): Promise<SelectedWriteFormPageType> => {
-  'use server';
-  try {
-    const userId = getUserId();
-    if (!userId) throw new Error("Unauthorized");
-
-    const page = await sql`
-      SELECT user_id, page_id, title, preview, content, book_id,
-        COALESCE((SELECT array_agg(pt.tag_id) FROM pages_tags pt WHERE pt.page_id = pages.page_id), ARRAY[]::TEXT[]) AS tag_ids
-      FROM pages
-      WHERE page_id = ${pageId} AND user_id = ${userId}
-    `;
-
-    if (page.length !== 1) {
-      throw new Error("can't find the write page");
-    }
-
-    return SelectedWriteFormPageSchema.parse({...page[0]});
-  } catch (error) {
-    console.error('Failed to fetch the write page', error);
-    throw new Error('Failed to fetch the write page');
-  }
-};
-
-const SelectWriteFormBooksSchema = z.array(BookSchema.pick({ user_id: true, book_id: true, book_title: true }))
-export type SelectWriteFormBooksType = z.infer<typeof SelectWriteFormBooksSchema>;    
-export const sqlSelectWriteFormBooks = async (): Promise<SelectWriteFormBooksType> => {
-  'use server';
-  try {
-    const userId = getUserId();
-    if (!userId) throw new Error("Unauthorized");
-
-    const books = await sql`
-      SELECT user_id, book_id, book_title
-      FROM books
-      WHERE user_id = ${userId}
-    `;
-
-    return SelectWriteFormBooksSchema.parse(books);
-  } catch (error) {
-    console.error('Failed to fetch the write books', error);
-    throw new Error('Failed to fetch the write books');
-  }
-}
-
-const parseTagIds = (tagIdsString: string): string[] => {
-  try {
-    const parsed = JSON.parse(tagIdsString);
-    return Array.isArray(parsed) ? parsed.filter(tag => typeof tag === 'string') : [];
-  } catch (error) {
-    console.error('Failed to parse the tag ids.', error);
-    return [];
-  }
-}
-const TagIdsSchema = z.string()
-  .transform(parseTagIds)
-  .pipe(TagsSchema.shape.tag_ids);
-const BookIdSchema = z.preprocess(
-  (value) => (value === '' ? null : value),
-  SelectedWriteFormPageSchema.shape.book_id
-)
-const CreatePageFromWriteFormSchema = z.object({
-  ...SelectedWriteFormPageSchema.pick({user_id: true, title: true, preview: true, content: true}).shape,
-  tag_ids: TagIdsSchema,
-  book_id: BookIdSchema
-});
-export type CreatePageFromWriteFormType = z.infer<typeof CreatePageFromWriteFormSchema>;
-export const sqlCreatePageFromWriteForm = async (auth: unknown, prevState: WriteFormStateType, formData: FormData): Promise<WriteFormStateType> => {
-  'use server'
-  try{
-    const validatedFormData = CreatePageFromWriteFormSchema.safeParse({
-      user_id: getUserId(),
-
-      title: formData.get('title'),
-      preview: formData.get('preview'),
-      tag_ids: formData.get('tag_ids'),
-      content: formData.get('content'),
-
-      book_id: formData.get('book_id')
-    });
-
-    if (!validatedFormData.success) {
-      return {
-        success: false,
-        message: 'Please enter approriately.',
-        errors: validatedFormData.error.flatten().fieldErrors,
-      }
-    }
-
-    const { user_id, title, preview, tag_ids, content, book_id } = validatedFormData.data;
-
-    const returned_page_id = await sql`
-      WITH inserted_page AS (
-        INSERT INTO pages (user_id, title, preview, content, book_id)
-        VALUES (${user_id}, ${title}, ${preview}, ${content}, ${book_id})
-        RETURNING page_id
-      ),
-      tags_insert AS (
-        INSERT INTO tags (tag_id)
-        SELECT unnest(${tag_ids}::TEXT[])
-        ON CONFLICT (tag_id) DO NOTHING
-      ),
-      pages_tags_insert AS (
-        INSERT INTO pages_tags (page_id, tag_id)
-        SELECT inserted_page.page_id, unnest(${tag_ids}::TEXT[])
-          FROM inserted_page
-        ON CONFLICT (page_id, tag_id) DO NOTHING
-      )
-      SELECT page_id FROM inserted_page
-    `;
-
-    const validatedReturnedPageId = PageSchema.shape.page_id.safeParse(returned_page_id[0].page_id)
-    if (!validatedReturnedPageId.success) {
-      return {
-        success: false,
-        message: 'Saved but some database error.',
-        page_id: validatedReturnedPageId.data
-      }
-    }
-
-    return {
-      success: true,
-      message: 'Page created successfully.',
-      page_id: validatedReturnedPageId.data
-    };
-  } catch (error) {
-    console.error('Database error:', error);
-    return {
-      success: false,
-      message: 'Database Error: Failed to Create a Page.'
-    };
-  }
-}
-
-const UpdatePageFromWriteFormSchema = z.object({
-  ...SelectedWriteFormPageSchema.pick({user_id: true, page_id: true, title: true, preview: true, content: true}).shape,
-  tag_ids: TagIdsSchema,
-  book_id: BookIdSchema
-});
-export type UpdatePageFromWriteFormType = z.infer<typeof UpdatePageFromWriteFormSchema>;
-export const sqlUpdatePageFromWriteForm = async (auth: unknown, prevState: WriteFormStateType, formData: FormData): Promise<WriteFormStateType> => {
-  'use server'
-  try {
-    const validatedFormData = UpdatePageFromWriteFormSchema.safeParse({
-      user_id: getUserId(),
-
-      page_id: formData.get('page_id'),
-
-      title: formData.get('title'),
-      preview: formData.get('preview'),
-      tag_ids: formData.get('tag_ids'),
-      content: formData.get('content'),
-
-      book_id: formData.get('book_id')
-    });
-
-    if (!validatedFormData.success) {
-      return {
-        success: false,
-        message: 'Please enter approriately.',
-        errors: validatedFormData.error.flatten().fieldErrors,
-      }
-    }
-
-    const { user_id, page_id, title, preview, tag_ids, content, book_id } = validatedFormData.data;
-    
-    await sql`
-      WITH updated_page AS (
-        UPDATE pages
-        SET title = ${title}, preview = ${preview}, content = ${content}, book_id = ${book_id}
-        WHERE user_id = ${user_id} AND page_id = ${page_id}
-        RETURNING page_id
-      ),
-      tags_insert AS (
-        INSERT INTO tags (tag_id)
-        SELECT unnest(${tag_ids}::TEXT[])
-        ON CONFLICT (tag_id) DO NOTHING
-      ),
-      pages_tags_insert AS (
-        INSERT INTO pages_tags (page_id, tag_id)
-        SELECT updated_page.page_id, unnest(${tag_ids}::TEXT[])
-          FROM updated_page
-        ON CONFLICT (page_id, tag_id) DO NOTHING
-      )
-      SELECT page_id FROM updated_page;
-    `
-
-    revalidatePath(`/${user_id}/${page_id}`);
-    return {
-      success: true,
-      message: 'Page updated successfully.'
-    };
-  } catch (error) {
-    console.error('Database error:', error);
-    return {
-      success: false,
-      message: 'Database Error: Failed to Update a Page.',
-    };
   }
 }
 

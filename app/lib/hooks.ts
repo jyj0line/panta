@@ -72,12 +72,12 @@ export const useDebounce = <T extends (...args: any[]) => void>(
 }
 
 //useToggleVisibility
-export type UseToggleVisibilityReturnType = {
+export type UseToggleVisibilityRet = {
   isVisible: boolean;
   setIsVisible: (value: SetStateAction<boolean>) => void;
   ref: RefObject<HTMLDivElement | null>;
 }
-export const useToggleVisibility = (): UseToggleVisibilityReturnType => {
+export const useToggleVisibility = (): UseToggleVisibilityRet => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement | null>(null);
   
@@ -99,7 +99,10 @@ export const useToggleVisibility = (): UseToggleVisibilityReturnType => {
 };
 
 //useIsVisibleAndIsSticky
-type UseIsVisibleAndIsStickyProps = {threshold: number, throttleTime: number}
+type UseIsVisibleAndIsStickyProps = {
+  threshold: number,
+  throttleTime: number
+}
 export const useIsVisibleAndIsSticky = ({threshold, throttleTime} : UseIsVisibleAndIsStickyProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isSticky, setIsSticky] = useState(false);
@@ -123,10 +126,100 @@ export const useIsVisibleAndIsSticky = ({threshold, throttleTime} : UseIsVisible
 
   useEffect(() => {
     window.addEventListener('scroll', throttledHandleScroll);
+    
     return () => window.removeEventListener('scroll', throttledHandleScroll);
   }, [throttledHandleScroll]);
 
   return { isVisible, isSticky };
+};
+
+//use Sync Function
+type SyncFunction<TInput extends any[], TOutput> = (...input: TInput) => TOutput;
+type UseSyncFunctionResult<TInput extends any[], TOutput> = [
+  (...input: TInput) => void,                               
+  TOutput,
+  React.Dispatch<React.SetStateAction<TOutput>>,
+  boolean
+];
+export const useSyncFunction = <TInput extends any[], TOutput>(
+  syncFunc: SyncFunction<TInput, TOutput>,
+  initialRes: TOutput
+): UseSyncFunctionResult<TInput, TOutput> => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [res, setRes] = useState<TOutput>(initialRes);
+
+  const trigger = (...input: TInput): void => {
+    setIsLoading(true);
+
+    setRes(syncFunc(...input));
+
+    setIsLoading(false);
+  };
+
+  return [trigger, res, setRes, isLoading];
+};
+
+//use Async Function
+type AsyncFunction<TInput extends any[], TOutput> = (...input: TInput) => Promise<TOutput>;
+type UseAsyncFunctionParam<TInput extends any[], TOutput> = {
+  asyncFunc: AsyncFunction<TInput, TOutput>;
+  initialRes: TOutput;
+  fallbackRes: TOutput;
+  mountTrigger: false;
+} | {
+  asyncFunc: AsyncFunction<TInput, TOutput>;
+  initialRes: TOutput;
+  fallbackRes: TOutput;
+  mountTrigger: true;
+  mountArgs: TInput;
+};
+type UseAsyncFunctionRet<TInput extends any[], TOutput> = [
+  (...input: TInput) => Promise<void>,                              
+  TOutput,
+  React.Dispatch<React.SetStateAction<TOutput>>,
+  boolean
+];
+export const useAsyncFunction = <TInput extends any[], TOutput>(
+  param: UseAsyncFunctionParam<TInput, TOutput>
+): UseAsyncFunctionRet<TInput, TOutput> => {
+  const {
+    asyncFunc,
+    initialRes,
+    fallbackRes,
+    mountTrigger,
+  } = param;
+
+  const callIdRef = useRef(0);
+  const [res, setRes] = useState<TOutput>(initialRes);
+  const [isLoading, setIsLoading] = useState(mountTrigger);
+
+  const trigger = async (...input: TInput): Promise<void> => {
+    const currentCallId = ++callIdRef.current;
+    setIsLoading(true);
+
+    try {
+      const result = await asyncFunc(...input);
+      if (callIdRef.current === currentCallId) {
+        setRes(result);
+      }
+    } catch {
+      if (callIdRef.current === currentCallId) {
+        setRes(fallbackRes);
+      }
+    } finally {
+      if (callIdRef.current === currentCallId) {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (mountTrigger) {
+      trigger(...param.mountArgs);
+    }
+  }, []);
+
+  return [trigger, res, setRes, isLoading];
 };
 
 //useIntersectionObserver

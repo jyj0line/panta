@@ -11,7 +11,7 @@ type BreadcrumbsProps = {
 }
 export const Breadcrumbs= ({breadcrumbs}: BreadcrumbsProps) => {
   return (
-    <nav aria-label="Breadcrumb" className="p-[1rem] hide-scrollbar">
+    <nav aria-label="Breadcrumb" className="p-[1rem] hide_scrollbar">
       <ol className='flex flex-row items-center'>
         {breadcrumbs.map((breadcrumb, index) => (
         <li

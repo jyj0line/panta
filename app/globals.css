@@ -9,9 +9,17 @@
     .little_container {
         @apply md:w-[750px] lg:w-[1000px] mx-auto;
     }
+    .small_container {
+        @apply sm:w-[575px] md:w-[750px] mx-auto;
+    }
+    .tiny_container {
+        @apply sm:w-[575px] mx-auto;
+    }
+
     .skeleton {
         @apply rounded-[0.25rem] bg-sub animate-pulse
     }
+
     .search {
         @apply w-full h-[3rem] p-[1rem] border-[0.05rem] border-supersub
         text-[1rem] placeholder:text-sub
@@ -20,15 +28,19 @@
     .textarea {
         @apply p-[1rem] overflow-hidden placeholder:text-sub
     }
-
-    
-    
-    .hide-scrollbar {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
+    .input {
+        @apply w-full bg-wh p-[1rem] rounded-[0.5rem] border-[0.1rem] border-supersub
     }
-    .hide-scrollbar::-webkit-scrollbar {
-        display: none;
+
+    .hide_scrollbar::-webkit-scrollbar {
+        width: 0.2rem;
+        height: 0rem;
+    }
+    .hide_scrollbar::-webkit-scrollbar-thumb {
+        background: var(--sub);
+    }
+    .hide_scrollbar::-webkit-scrollbar-track {
+        background: var(--supersub);
     }
 }
 
@@ -44,18 +56,26 @@ textarea {
     resize: none;
 }
 
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
 :root {
     --wh: #ffffff;
     
     --background: #fafafa;
     --powerbackground: #f5f5f5;
+    --superforeground: #171717;
     --foreground: #0a0a0a;
 
-    --sub: #737373;
     --supersub: #d4d4d4;
+    --sub: #737373;
 
     --em: #22c55e;
     --powerem: #166534;
+    --superduperbad: #fef2f2;
+    --superbad: #fca5a5;
     --bad: #ef4444;
     --powerbad: #991b1b;
 }

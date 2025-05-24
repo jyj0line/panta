@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image'
 
 import { SearchResultType } from '@/app/lib/sqls';
-import {  ViewSvg, LikeSvg } from "@/app/lib/svgs"
+import { ViewOnSvg as ViewSvg, LikeSvg } from "@/app/lib/svgs"
 
 ///tmp
 import a from '@/public/a.png'
@@ -18,7 +18,7 @@ export const SearchResult = memo(({page_id, title, preview, created_at, view, li
                     <p className='h-[3rem] p-[0.25rem] line-clamp-2 word-break break-words hyphens-auto text-[1rem] leading-[1.2rem] font-[300] text-sub'>{preview}</p>
                     <p className="h-[3rem]"></p>
                 </Link>
-                <div className='flex flex-row overflow-x-auto whitespace-nowrap space-x-[0.5rem] hide-scrollbar'>
+                <div className='flex flex-row overflow-x-auto whitespace-nowrap space-x-[0.5rem] hide_scrollbar'>
                     {tag_ids.map((tag_id) => (
                     <Link href={`/search?tag=${tag_id}`} key={tag_id} className='p-[0.3rem] rounded-[0.5rem] border-[0.1rem] border-em text-[1rem]'>
                         {tag_id}

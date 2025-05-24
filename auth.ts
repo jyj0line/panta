@@ -1,90 +1,93 @@
-import type { User } from 'next-auth';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import bcrypt from 'bcrypt';
-import { neon } from '@neondatabase/serverless';
 import { z } from 'zod';
-import { USER } from '@/app/lib/constants'
+import bcrypt from 'bcrypt';
+
 import { authConfig } from '@/auth.config';
+import { getUserSF, selectProfileImageUrlSF, selectBioSF } from '@/app/lib/SFs/authSFs';
+import { UserSchema, UnhashedPasswordSchema } from '@/app/lib/tables';
 
-// neon connection
-const getDatabaseConnection = async () => {
-    'use server';
-    if (!process.env.DATABASE_URL) {
-      throw new Error('DATABASE_URL is not set.');
-    }
-    return neon(process.env.DATABASE_URL);
-};
-const sql = await getDatabaseConnection();
-
-// schema
-
-export type LoginningUser = User & {
-  hashed_password: string;
-};
-const {
-  USER_ID_MIN,
-  USER_ID_MAX,
-  USER_UNHASHED_PASSWORD_MIN,
-  USER_UNHASHED_PASSWORD_MAX,
-  USER_HASHED_PASSWORD_LENGTH
-} = USER;
-
-const UserLoginRequestSchema = z.object({
-  user_id:
-    z.string()
-    .min(USER_ID_MIN, { message: `User ID must be at least ${USER_ID_MIN} characters long.`})
-    .max(USER_ID_MAX, { message: `User ID must be no more than ${USER_ID_MAX} characters long.`}),
-  unhashed_password:
-    z.string()
-    .min(USER_UNHASHED_PASSWORD_MIN, { message: `Password must be at least ${USER_UNHASHED_PASSWORD_MIN} characters long.`})
-    .max(USER_UNHASHED_PASSWORD_MAX, { message: `User ID must be no more than ${USER_UNHASHED_PASSWORD_MAX} characters long.`}),
+const AuthrizeParamSchema = z.object({
+  user_id: UserSchema.shape.user_id,
+  unhashed_password: UnhashedPasswordSchema
 });
-type UserLoginRequestType = z.infer<typeof UserLoginRequestSchema>;
-
-const UserLoginReturnSchema = z.object({
-  user_id:
-    z.string()
-    .min(USER_ID_MIN, { message: `User ID must be at least ${USER_ID_MIN} characters long.`})
-    .max(USER_ID_MAX, { message: `User ID must be no more than ${USER_ID_MAX} characters long.`}),
-  hashed_password:
-    z.string()
-    .length(USER_HASHED_PASSWORD_LENGTH, { message: `Hashed password must be ${USER_HASHED_PASSWORD_LENGTH} characters long.`})
-});
-type UserLoginReturnType = z.infer<typeof UserLoginReturnSchema>;
-
-async function getUser(user_id: UserLoginRequestType["user_id"]): Promise<LoginningUser | undefined> {
-  try {
-    const user = await sql`SELECT user_id, hashed_password FROM users WHERE user_id=${user_id}`;
-
-    const parsedUser = UserLoginReturnSchema.parse(user[0]);
-    return { id: parsedUser.user_id, hashed_password: parsedUser.hashed_password };
-  } catch (error) {
-    console.error('Failed to fetch user:', error);
-    throw new Error('Failed to fetch user.');
-  }
-}
-
-export const { auth, signIn, signOut } = NextAuth({
+export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
+
   providers: [
     Credentials({
       async authorize(credentials) {
-        const parsedCredentials = UserLoginRequestSchema.safeParse(credentials);
+        const parsedCredentials = AuthrizeParamSchema.safeParse(credentials);
 
         if (parsedCredentials.success) {
-          const { user_id: inputted_user_id, unhashed_password } = parsedCredentials.data;
+          const validatedCredentials = parsedCredentials.data;
 
-          const user = await getUser(inputted_user_id);
-          if (!user) return null;
+          const user = await getUserSF(validatedCredentials.user_id);
 
-          const passwordsMatch = await bcrypt.compare(unhashed_password, user.hashed_password);
-          const ret = { id: user.id };
-          if (passwordsMatch) return ret;
+          if (!user) {
+            return null;
+          }
+
+          const isPasswordMatched = await bcrypt.compare(validatedCredentials.unhashed_password, user.hashed_password);
+          if (isPasswordMatched) {
+            return {
+              user_id: user.user_id,
+              profile_image_url: user.profile_image_url,
+              bio: user.bio
+            };
+          }
         }
 
         return null;
       },
     }),
   ],
+
+  callbacks: {
+    ...authConfig.callbacks,
+
+    async jwt({ token, user, trigger, session }) {
+      // When the user signs in for the first time
+      if (user) {
+        token.user_id = user.user_id
+        token.profile_image_url = user.profile_image_url
+        token.bio = user.bio
+      }
+
+      // When useSession().update is called
+      if (trigger === "update") {
+        if (session._update.profile_image_url && typeof token.user_id === "string") {
+          try {
+            const updatedProfileImageUrl = await selectProfileImageUrlSF(token.user_id);
+
+            token.profile_image_url = updatedProfileImageUrl;
+          } catch(_) {}
+        }
+
+        if (session._update.bio && typeof token.user_id === "string") {
+          try {
+            const updatedBio = await selectBioSF(token.user_id);
+
+            token.bio = updatedBio;
+          } catch(_) {}
+        }
+      }
+
+      return token;
+    },
+    
+    session({ session, token }) {
+      if (typeof token.user_id === 'string') {
+        session.user.user_id = token.user_id
+      }
+      if (typeof token.profile_image_url === 'string') {
+        session.user.profile_image_url = token.profile_image_url
+      }
+      if (typeof token.bio === 'string') {
+        session.user.bio = token.bio
+      }
+
+      return session;
+    }
+  }
 });

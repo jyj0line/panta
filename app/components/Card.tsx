@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link';
 
 import type {CardType} from '@/app/lib/sqls'
-import {LikeSvg, ViewSvg} from "@/app/lib/svgs"
+import {LikeSvg, ViewOnSvg as ViewSvg} from "@/app/lib/svgs"
 ///tmp
 import a from '@/public/a.png'
 ///tmp

@@ -21,7 +21,7 @@ export const InfiniteScrollSearchResults = ({ searchedMode, searchedParams }: In
     request: searchedParams,
     chunkSize: CHUNK_SIZE,
 
-    initialOffset: 1,
+    initialChunk: 1,
     loadInitialData: true,
 
     onError: () => {

@@ -1,17 +1,18 @@
-import Link from 'next/link'
+import type { Metadata } from 'next';
 
-import { LoginForm } from "@/app/components/LoginForm"; 
-import { PantaSvg } from '@/app/lib/svgs';
+import { Logo } from '@/app/components/leaves/Logos';
+import { LoginForm } from "@/app/components/login/LoginForm"; 
+
+export const metadata: Metadata = {
+  title: 'Login'
+};
 
 const LoginPage = () => {
   return (
     <main className='flex flex-col justify-center items-center min-h-dvh bg-background'>
-      <Link href='/'>
-        <PantaSvg className="w-[8rem] h-auto m-[0.5rem]"/>
-      </Link>
-
+      <Logo className='h-[3rem] m-[1rem]'/>
       <LoginForm />
     </main>
   )
-}
+};
 export default LoginPage;
