@@ -1,13 +1,7 @@
-import { type Metadata } from "next";
-
 import { ToastBundleProvider } from "@/app/lib/contexts/ToastBundleContext";
 import { UserId } from "@/app/components/leaves/UserId";
 import { ProfileImageForm } from "@/app/components/setting/ProfileImageForm";
 import { BioForm } from "@/app/components/setting/BioForm";
-
-export const metadata: Metadata = {
-  title: 'Setting: Profile'
-};
 
 const SettingPage = () => {
     return(

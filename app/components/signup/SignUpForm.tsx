@@ -9,7 +9,7 @@ import { validateUserIdSF, signUpSF, loginSF } from '@/app/lib/SFs/publicSFs';
 import { uploadImageCF } from '@/app/lib/publicCFs';
 import { useSyncFunction, useAsyncFunction } from '@/app/lib/hooks';
 import { validateUnhashedPassword, validateUnhashedPasswordForConfirm, validateBio } from "@/app/lib/utils";
-import { IdInput } from '@/app/components/leaves/IdInput';
+import { TextInput } from '@/app/components/leaves/TextInput';
 import { PasswordInput } from '@/app/components/leaves/PasswordInput';
 import { CheckBox } from '@/app/components/leaves/CheckBox';
 import { ProfileImageSelector } from '@/app/components/leaves/ProfileImageSelector';
@@ -275,7 +275,7 @@ export const SignUpForm = () => {
             ${isUserIdLoading ? 'pointer-events-none animate-opacity-loading' : ''}
           `}
         >
-          <IdInput
+          <TextInput
             ref={userIdRef}
             name="user_id"
             value={userId}

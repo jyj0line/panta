@@ -18,7 +18,6 @@ export const IngButton = ({
     id,
     className="h-[2rem]"
 }: IngButtonProps) => {
-    console.log(isIng, isImm);
     return (
         <button
             id={id}
@@ -40,20 +39,17 @@ export const IngButton = ({
             `}
         >
             {children}
-            {isIng && (
-                <SpinnerSvg
-                    className={`
-                        absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]
-                        w-auto h-[60%] aspect-square opacity-[0]
-                        ${isIng
-                            ? (isImm
-                                ? 'animate-spin-centered-imm'
-                                : 'animate-spin-centered')
-                            : ''
-                        }
-                    `}
-                />
-            )}
+            {isIng
+            && <SpinnerSvg
+                className={`
+                    absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]
+                    w-auto h-[60%] aspect-square opacity-[0]
+                    ${isImm
+                        ? 'animate-spin-centered-imm'
+                        : 'animate-spin-centered'
+                    }
+                `}
+            />}
         </button>
     );
 };

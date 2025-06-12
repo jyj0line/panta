@@ -4,16 +4,16 @@
 
 @layer components {
     .container {
-        @apply md:w-[750px] lg:w-[1000px] xl:w-[1300px] mx-auto;
+        @apply w-full md:w-[750px] lg:w-[1010px] xl:w-[1260px] mx-auto;
     }
     .little_container {
-        @apply md:w-[750px] lg:w-[1000px] mx-auto;
+        @apply w-full sm:w-[620px] md:w-[750px] lg:w-[1010px] mx-auto;
     }
     .small_container {
-        @apply sm:w-[575px] md:w-[750px] mx-auto;
+        @apply w-full sm:w-[620px] md:w-[750px] mx-auto;
     }
     .tiny_container {
-        @apply sm:w-[575px] mx-auto;
+        @apply w-full sm:w-[620px] mx-auto;
     }
 
     .skeleton {
@@ -30,6 +30,9 @@
     }
     .input {
         @apply w-full bg-wh p-[1rem] rounded-[0.5rem] border-[0.1rem] border-supersub
+    }
+    .token {
+        @apply p-[0.4rem] rounded-[0.5rem] border-[0.1rem]
     }
 
     .hide_scrollbar::-webkit-scrollbar {

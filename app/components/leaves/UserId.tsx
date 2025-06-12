@@ -1,6 +1,6 @@
 "use client";
 
-import { useSessCtxedUserContext } from "@/app/lib/contexts/SessCtxedUserContext";
+import { useSCtxedUserContext } from "@/app/lib/contexts/SCtxedUserContext";
 
 type UserIdProps = {
     className: string
@@ -10,7 +10,7 @@ export const UserId = ({
     className="leading-[1.2] text-[2.5rem] font-[500]",
     skeletionClassName="w-[10rem] h-[3rem]"
 }: UserIdProps) => {
-    const { user, isUserFirstLoading } = useSessCtxedUserContext();
+    const { user, isUserFirstLoading } = useSCtxedUserContext();
     
     if (isUserFirstLoading) return (
         <div className={`rounded-[0.5rem] bg-supersub animate-pulse ${skeletionClassName}`}></div>

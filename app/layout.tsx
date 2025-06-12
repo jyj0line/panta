@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 
-import "@/app/globals.css";
+import {ToastBundleProvider} from "@/app/lib/contexts/ToastBundleContext";
 import { inter } from '@/app/lib/fonts';
+import "@/app/globals.css";
 
 export const metadata: Metadata = {
   title: {
@@ -21,7 +22,9 @@ const Layout = ({
   return (
     <html lang="en">
       <body className={`min-h-dvh text-[16px] ${inter.className} antialiased bg-background text-foreground`}>
-        {children}
+        <ToastBundleProvider>
+          {children}
+        </ToastBundleProvider>
       </body>
     </html>
   );

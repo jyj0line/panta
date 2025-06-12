@@ -1,10 +1,4 @@
-import { type Metadata } from "next";
-
-import { DeleteAccountForm } from "@/app/components/settingAccount/DeleteAccountForm";
-
-export const metadata: Metadata = {
-  title: 'Delete Account'
-};
+import { DeleteAccountForm } from "@/app/components/groSettingAccount/DeleteAccountForm";
 
 const DeleteaccountPage = () => {
   return (

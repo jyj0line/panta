@@ -1,7 +1,9 @@
-'use client'
+'use client';
+
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { RefObject, SetStateAction  } from 'react';
-import type { ChunkedRequestType } from '@/app/lib/sqls';
+import type { RefObject, SetStateAction } from 'react';
+
+import { type CQ, type CS } from '@/app/lib/utils';
 
 //useThrottle
 export const useThrottle = <T extends (...args: any[]) => void>(
@@ -238,7 +240,7 @@ export const useIntersectionObserver = ({
 
   useEffect(() => {
     if (!enabled || !targetRef?.current) return;
-    
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -259,91 +261,73 @@ export const useIntersectionObserver = ({
   return targetRef;
 };
 
-//useInfiniteScroll
-export type ChunkedResponseType<T> = {
-  items: T[];
-  hasNextChunk: boolean;
-  totalCount?: number;
+//use infinite scroll
+const INIT_CURRENT_CHUNK = 0;
+type GeneralizedCP<T> = CS & { items: T[] };
+export type UseInfiniteScrollProps<TRequest extends Record<string, unknown>, TResponse> = {
+    getItems: (chunkedRequest: CQ & TRequest) => Promise<GeneralizedCP<TResponse>>;
+    req: TRequest;
+    limit: number;
 }
-export type InfiniteScrollProps<TRequest extends Record<string, unknown>, TResponse> = {
-    selectItems: (chunkedRequest: ChunkedRequestType & TRequest) => Promise<ChunkedResponseType<TResponse>>;
-    request: TRequest;
-    chunkSize: number;
-
-    initialChunk: number;
-    loadInitialData: boolean;
-
-    onError: () => void;
-}
-export type InfiniteScrollReturn<TResponse> = {
+export type InfiniteScrollRet<TResponse> = {
     items: TResponse[];
     hasNextChunk: boolean;
-    totalCount?: number;
+    totalCount: number | null;
 
     isLoading: boolean;
+    isNewLoading: boolean;
     isError: boolean;
 
     loadMore: () => Promise<void>;
-
-    currentChunk: number;
-    reset: () => void;
 }
-export const useInfiniteScroll = <TRequest extends Record<string, unknown>, TResponse>(
-  props: InfiniteScrollProps<TRequest, TResponse>
-  ): InfiniteScrollReturn<TResponse> => {
-    const {
-      selectItems,
-      request,
-      chunkSize,
-
-      initialChunk,
-      loadInitialData,
-
-      onError
-    } = props;
-  
+export const useInfiniteScroll = <TRequest extends Record<string, unknown>, TResponse>({
+  getItems,
+  req,
+  limit
+}: UseInfiniteScrollProps<TRequest, TResponse>): InfiniteScrollRet<TResponse> => {
     const [items, setItems] = useState<TResponse[]>([]);
     const [hasNextChunk, setHasNextChunk] = useState<boolean>(true);
-    const [totalCount, setTotalCount] = useState<number | undefined>(undefined);
+    const [totalCount, setTotalCount] = useState<number | null>(null);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isError, setIsError] = useState<boolean>(false);
 
-    const latestRequestIdRef = useRef<number>(0);
-    const prevRequestRef = useRef<TRequest>(request);
+    const [currentChunk, setCurrentChunk] = useState(INIT_CURRENT_CHUNK);
+    const prevReqRef = useRef<TRequest>(req);
+    const cidRef = useRef<number>(0);
 
-    const [currentChunk, setCurrentChunk] = useState(initialChunk);
+    const isNewLoading = isLoading && items.length <= 0 && !totalCount;
 
-    const loadItems = async (offset: number): Promise<void> => {
+    const loadItems = async (curChunk: number): Promise<void> => {
       setIsLoading(true);
       setIsError(false);
 
-      const requestId = ++latestRequestIdRef.current;
-  
+      const cid = ++cidRef.current;
+
       try {
-        const response = await selectItems({ chunk: offset, limit: chunkSize, ...request });
-        
-        if (requestId !== latestRequestIdRef.current) {
+        const res = await getItems({ chunk: curChunk, limit: limit, ...req });
+        if (cid !== cidRef.current) {
           return;
         }
-
-        setItems(prevItems => 
-          offset === initialChunk 
-            ? response.items 
-            : [...prevItems, ...response.items]
-        );
         
-        setHasNextChunk(response.hasNextChunk);
-        setTotalCount(response?.totalCount);
-        setCurrentChunk(offset + 1);
-      } catch (error) {
-        console.error(`Request error (requestId: ${requestId}):`, error);
-        if (requestId === latestRequestIdRef.current) {
-          setIsError(true);
-          onError();
+        if (curChunk === INIT_CURRENT_CHUNK) {
+          setItems(res.items);
+        } else {
+          setItems(prevItems => [...prevItems, ...res.items]);
         }
+        setHasNextChunk(res.hasNextChunk);
+        setTotalCount(res?.totalCount ?? null);
+        setCurrentChunk(curChunk + 1);
+      } catch (error) {
+        console.error(`SWW in selectItem ${cid})`);
+
+        if (cid !== cidRef.current) {
+          return;
+        }
+        
+        setIsError(true);
       } finally {
-        if (requestId === latestRequestIdRef.current) {
+        if (cid === cidRef.current) {
           setIsLoading(false);
         }
       }
@@ -355,34 +339,31 @@ export const useInfiniteScroll = <TRequest extends Record<string, unknown>, TRes
     };
 
     const reset = () => {
+      cidRef.current = 0;
+    
       setItems([]);
       setHasNextChunk(true);
-      setTotalCount(undefined);
+      setTotalCount(null);
 
-      setIsError(false)
+      setIsLoading(true);
+      setIsError(false);
 
-      setCurrentChunk(initialChunk);
-
-      loadItems(initialChunk);
+      loadItems(INIT_CURRENT_CHUNK);
     };
-    
+
     useEffect(() => {
-      if (JSON.stringify(prevRequestRef.current) != JSON.stringify(request)) {
-        prevRequestRef.current = request;
+      if (JSON.stringify(prevReqRef.current) !== JSON.stringify(req)) {
+        prevReqRef.current = req;
         reset();
         return;
       }
 
-      if (loadInitialData) {
-        loadItems(initialChunk);
-      } else {
-        setIsLoading(false);
-      }
-  
+      loadItems(INIT_CURRENT_CHUNK);
+
       return () => {
-        latestRequestIdRef.current = 0;
+        cidRef.current = 0;
       };
-    }, [loadInitialData, initialChunk, request]);
+    }, [req]);
   
     return {
       items,
@@ -390,11 +371,138 @@ export const useInfiniteScroll = <TRequest extends Record<string, unknown>, TRes
       totalCount,
 
       isLoading,
+      isNewLoading,
       isError,
 
-      currentChunk,
-
-      loadMore,
-      reset,
+      loadMore
     };
+}
+
+// use pagination
+type GenPaginationPsParam = {
+  currentP: number,
+  totalP: number | null,
+  paginationPsLen: number;
+};
+const genPaginationPs = ({ currentP, totalP, paginationPsLen } : GenPaginationPsParam): number[] => {
+  if (!totalP) return [];
+
+  const startP = Math.floor((currentP - 1) / paginationPsLen) * paginationPsLen + 1;
+  const endP = Math.min(startP + paginationPsLen - 1, totalP);
+
+  const paginationPs: number[] = [];
+  for (let i = startP; i <= endP; i++) {
+    paginationPs.push(i);
+  }
+  return paginationPs;
+};
+export type UsePaginationParam<TRequest extends Record<string, unknown>, TResponse> = {
+  getItems: (chunkedRequest: CQ & TRequest) => Promise<GeneralizedCP<TResponse>>,
+  req: TRequest,
+  p: number,
+  limit: number,
+  paginationPsLen: number,
+}
+export type UsePaginationRet<TResponse> = {
+  items: TResponse[],
+  totalCount: number | null,
+
+  totalP: number | null,
+  paginationPs: number[],
+
+  isLoading: boolean,
+  isNewLoading: boolean,
+  isError: boolean,
+}
+export const usePagination = <TRequest extends Record<string, unknown>, TResponse>({
+  getItems,
+  req,
+  p,
+  limit,
+  paginationPsLen
+}: UsePaginationParam<TRequest, TResponse>): UsePaginationRet<TResponse> => {
+  const [items, setItems] = useState<TResponse[]>([]);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isError, setIsError] = useState<boolean>(false);
+  
+  const totalP = totalCount ? Math.ceil(totalCount/limit) : null;
+  const paginationPs = genPaginationPs({currentP: p, totalP: totalP, paginationPsLen: paginationPsLen});
+
+  const prevReqRef = useRef<TRequest>(req);
+  const cidRef = useRef<number>(0);
+  
+  const isNewLoading = isLoading && items.length === 0 && totalCount === null;
+
+  const loadItems = async (): Promise<void> => {
+    setIsLoading(true);
+    setIsError(false);
+
+    const cid = ++cidRef.current;
+
+    try {
+      const res = await getItems({
+        chunk: p - 1,
+        limit: limit,
+        ...req
+      });
+
+      if (cid !== cidRef.current) {
+        return;
+      }
+
+      setItems(res.items);
+      setTotalCount(res?.totalCount ?? null);
+    } catch (error) {
+      console.error(`SWW in loadItem ${cid})`);
+      if (cid !== cidRef.current) {
+        return;
+      }
+      
+      setIsError(true);
+    } finally {
+      if (cid === cidRef.current) {
+        setIsLoading(false);
+      }
+    }
+  };
+    
+  const reset = () => {
+    cidRef.current = 0;
+
+    setItems([]);
+    setTotalCount(null);
+
+    setIsLoading(true);
+    setIsError(false);
+
+    loadItems();
+  };
+
+  useEffect(() => {
+    if (JSON.stringify(prevReqRef.current) !== JSON.stringify(req)) {
+      prevReqRef.current = req;
+      reset();
+      return;
+    }
+
+    loadItems();
+
+    return () => {
+      cidRef.current = 0;
+    };
+  }, [p, JSON.stringify(req)]);
+
+  return ({
+    items,
+    totalCount,
+
+    totalP,
+    paginationPs,
+
+    isLoading,
+    isNewLoading,
+    isError
+  })
 }

@@ -1,21 +1,33 @@
-import type { Metadata } from 'next';
+import { Page } from "@/app/components/dynAuthorId/Page";
+import { BooPageTurner, AutPageTurner } from "@/app/components/dynAuthorId/PageTurner";
+import { StickyDiv } from '@/app/components/divs/StickyDiv';
+import { PageViewUpdater } from "@/app/components/backgrounder/PageViewUpdater";
 
-import { sqlSelectPage } from "@/app/lib/sqls";
-
-const PageIdDynamicPage = async ({
+const DynPageIdPage = async ({
   params,
 }: {
-  params: Promise<{ userId: string; pageId: string; }>
+  params: Promise<{ authorId: string; pageId: string; }>
 }) => {
-  const { userId, pageId } = await params;
-
-  const page = await sqlSelectPage(pageId);
+  const { authorId, pageId } = await params;
 
   return (
-    <div>hi</div>
-    // <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
-    //   <Table query={query} currentPage={currentPage} />
-    // </Suspense>
+    <div className='relative flex-1 flex flex-col'>
+      <Page
+        pageId={pageId}
+        className="flex-1 small_container p-[0.5rem]"
+      />
+
+        {/* <CottonCandy
+          authorId={authorId}
+        /> */}
+
+      <StickyDiv type="bottom">
+        <BooPageTurner curPageId={pageId} className='little_container h-[2.5rem] p-[0.5rem]'/>
+        <AutPageTurner curPageId={pageId} className='little_container h-[2.5rem] p-[0.5rem]'/>
+      </StickyDiv>
+
+      <PageViewUpdater pageId={pageId} />
+    </div>
   )
 }
-export default PageIdDynamicPage;
+export default DynPageIdPage;

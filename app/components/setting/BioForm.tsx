@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { updateBioASF } from "@/app/lib/SFs/afterAuthSFs";
-import { useSessCtxedUserContext } from "@/app/lib/contexts/SessCtxedUserContext";
+import { useSCtxedUserContext } from "@/app/lib/contexts/SCtxedUserContext";
 import { useToastBundleContext, makeToastOrder } from "@/app/lib/contexts/ToastBundleContext";
 import { ScrollTextareaInput } from "@/app/components/leaves/ScrollTextareaInput";
 import { IngButton } from "@/app/components/leaves/IngButton";
@@ -34,7 +34,7 @@ type BioFormProps = {
     className: string;
 }
 export const BioForm = ({className}: BioFormProps) => {
-    const {user, isUserFirstLoading, updateSessionUser} = useSessCtxedUserContext();
+    const {user, isUserFirstLoading, updateSessionUser} = useSCtxedUserContext();
     const { addToast } = useToastBundleContext();
 
     const [bio, setBio] = useState<string>("");

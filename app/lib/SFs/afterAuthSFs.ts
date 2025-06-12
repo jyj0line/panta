@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import type { User } from 'next-auth';
 import { v2 as cloudinary } from "cloudinary";
 import { z } from "zod";
@@ -9,8 +10,8 @@ import bcrypt from 'bcrypt';
 import { auth } from '@/auth';
 import { sql, logoutSF } from "@/app/lib/SFs/publicSFs";
 import { type Page, UnhashedPasswordSchema, UserSchema, PageSchema, BookSchema, TagsSchema } from '@/app/lib/tables';
-
 import { METADATA, LOADING, SUCCESS, ERROR, COMMON } from '@/app/lib/constants';
+
 const {
   WRITE_TITLE_METADATA
 } = METADATA;
@@ -482,7 +483,7 @@ export const deleteUserASF = async (param: DeleteUserParam): Promise<DeleteUserR
 }
 
 
-// write start
+{/* write start */}
 const GetWriteTitleParamSchema = PageSchema.shape.page_id;
 type GetWriteTitleParam = z.infer<typeof GetWriteTitleParamSchema>;
 const GetWriteTitleRetSchema = PageSchema.shape.title;
@@ -499,7 +500,7 @@ export const getWriteTitleASF = async (param: GetWriteTitleParam): Promise<GetWr
 
     const parsedParam = GetWriteTitleParamSchema.safeParse(param);
     if (!parsedParam.success) {
-      console.error(parsedParam);
+      console.error(parsedParam.error);
       throw new Error("Invalid param");
     }
 
@@ -543,7 +544,7 @@ const SelectWriteRetSchema = z.object({
 
     book_id: true,
   }).shape,
-  tag_ids: TagsSchema.shape.tag_ids
+  tag_ids: TagsSchema
 });
 export type SelectWritePageRet = z.infer<typeof SelectWriteRetSchema>;
 export const selectWritePageASF = async (param: SelectWritePageParam): Promise<SelectWritePageRet> => {
@@ -558,7 +559,7 @@ export const selectWritePageASF = async (param: SelectWritePageParam): Promise<S
 
     const parsedParam = SelectWritePageParamSchema.safeParse(param);
     if (!parsedParam.success) {
-      console.error(parsedParam);
+      console.error(parsedParam.error);
       throw new Error("Invalid param");
     }
 
@@ -586,7 +587,9 @@ export const selectWritePageASF = async (param: SelectWritePageParam): Promise<S
   }
 };
 
-const SelectWriteBooksRetSchema = z.array(BookSchema.pick({ book_id: true, book_title: true }))
+const InitBookSchema = BookSchema.pick({ book_id: true, book_title: true });
+export type InitBook = z.infer<typeof InitBookSchema>;
+const SelectWriteBooksRetSchema = z.array(InitBookSchema);
 export type SelectWriteBooksRet = z.infer<typeof SelectWriteBooksRetSchema>;    
 export const selectWriteBooksASF = async (): Promise<SelectWriteBooksRet> => {
   'use server';
@@ -613,6 +616,21 @@ export const selectWriteBooksASF = async (): Promise<SelectWriteBooksRet> => {
   } catch (error) {
     console.error('Failed to fetch the write books', error);
     throw new Error('Failed to fetch the write books');
+  }
+}
+
+const updateWroteAtHASF = async () => {
+  "use server";
+
+  try {
+    const user = await getAuthenticatedUserASF();
+    if (!user) throw new Error("Unauthenticated in updateWroteAtHASF");
+
+    await sql`
+      UPDATE users SET wrote_at = CURRENT_TIMESTAMP
+    `;
+  } catch(error) {
+    console.error("SSW in updateWroteAtHASF");
   }
 }
 
@@ -645,6 +663,9 @@ export type CreateWriteState = CreateWriteSuccessState | CreateWriteFailureState
 export const createWriteASF = async (param: CreateWriteParam): Promise<CreateWriteState> => {
   'use server';
 
+  let successFlag = false;
+  let returnedPageId = '';
+
   try {
     const user = await getAuthenticatedUserASF();
     if (!user) {
@@ -657,7 +678,7 @@ export const createWriteASF = async (param: CreateWriteParam): Promise<CreateWri
 
     const parsedParam = CreateWriteParamSchema.safeParse(param);
     if (!parsedParam.success) {
-      console.error(INVALID_INPUT_ERROR, parsedParam);
+      console.error(INVALID_INPUT_ERROR, parsedParam.error);
       return {
         success: false,
         message: INVALID_INPUT_ERROR,
@@ -689,13 +710,16 @@ export const createWriteASF = async (param: CreateWriteParam): Promise<CreateWri
 
     const parsedReturnedPageId = PageSchema.shape.page_id.safeParse(createWriteRes[0].page_id);
     if (!parsedReturnedPageId.success) {
-      console.error(CREATE_PAGE_SOMETHING_ERROR, parsedReturnedPageId);
+      console.error(CREATE_PAGE_SOMETHING_ERROR, parsedReturnedPageId.error);
       return {
         success: false,
         message: CREATE_PAGE_SOMETHING_ERROR
       }
     }
 
+    successFlag = true;
+    returnedPageId = parsedReturnedPageId.data;
+    await updateWroteAtHASF();
     return {
       success: true,
       message: CREATE_PAGE_SUCCESS,
@@ -703,6 +727,14 @@ export const createWriteASF = async (param: CreateWriteParam): Promise<CreateWri
     };
   } catch (error) {
     console.error(CREATE_PAGE_SOMETHING_ERROR, error);
+
+    if (successFlag) {
+      return {
+        success: true,
+        message: CREATE_PAGE_SUCCESS,
+        page_id: returnedPageId
+      };
+    }
     return {
       success: false,
       message: CREATE_PAGE_SOMETHING_ERROR
@@ -747,7 +779,7 @@ export const updateWriteASF = async (param: UpdateWriteParam): Promise<UpdateWri
 
     const parsedParam = UpdateWriteParamSchema.safeParse(param);
     if (!parsedParam.success) {
-      console.error(INVALID_INPUT_ERROR, parsedParam);
+      console.error(INVALID_INPUT_ERROR, parsedParam.error);
       return {
         success: false,
         message: INVALID_INPUT_ERROR,
@@ -760,7 +792,7 @@ export const updateWriteASF = async (param: UpdateWriteParam): Promise<UpdateWri
     const updateWriteRes = await sql`
       WITH updated_page AS (
         UPDATE pages
-        SET title = ${title}, preview = ${preview}, content = ${content}, book_id = ${book_id}
+        SET title = ${title}, preview = ${preview}, content = ${content}, book_id = ${book_id}, updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ${user.user_id} AND page_id = ${page_id}
         RETURNING page_id
       ),
@@ -780,7 +812,7 @@ export const updateWriteASF = async (param: UpdateWriteParam): Promise<UpdateWri
 
     const parsedReturnedPageId = PageSchema.shape.page_id.safeParse(updateWriteRes[0].page_id);
     if (!parsedReturnedPageId.success) {
-      console.error(UPDATE_PAGE_SOMETHING_ERROR, parsedReturnedPageId);
+      console.error(UPDATE_PAGE_SOMETHING_ERROR, parsedReturnedPageId.error);
       return {
         success: false,
         message: UPDATE_PAGE_SOMETHING_ERROR
@@ -789,7 +821,7 @@ export const updateWriteASF = async (param: UpdateWriteParam): Promise<UpdateWri
 
     successFlag = true;
     revalidatePath(`/${user.user_id}/${page_id}`);
-
+    await updateWroteAtHASF();
     return {
       success: true,
       message: UPDATE_PAGE_SUCCESS
@@ -808,74 +840,350 @@ export const updateWriteASF = async (param: UpdateWriteParam): Promise<UpdateWri
     };
   }
 }
-// write end
 
-const SubscribeParamSchema = z.object({
-  userId: UserSchema.shape.user_id,
-  authorId: UserSchema.shape.user_id
+// create a book
+const CreateBookParamSchema = BookSchema.shape.book_title;
+type CreateBookParam = z.infer<typeof CreateBookParamSchema>;
+const CrateBookSuccessRetBookIdSchema = BookSchema.shape.book_id;
+type CreateBookSuccessRet = {
+  success: true
+  bookId: z.infer<typeof CrateBookSuccessRetBookIdSchema>
+}
+type CreateBookFailureRet = {
+  success: false
+  errors: string[]
+}
+type CreateBookRet = CreateBookSuccessRet | CreateBookFailureRet;
+export const createBookASF = async (param: CreateBookParam): Promise<CreateBookRet> => {
+  'use server';
+
+  try {
+    const writer = await getAuthenticatedUserASF();
+    if (!writer) {
+      console.error(UNAUTHENTICATED_ERROR, writer);
+      return {
+        success: false,
+        errors: [UNAUTHENTICATED_ERROR]
+      }
+    }
+
+    const parsedParam = CreateBookParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      return {
+        success: false,
+        errors: parsedParam.error.errors.map(e => e.message)
+      }
+    }
+
+    const writerId = writer.user_id;
+    const bookTitle = parsedParam.data;
+
+    const bookId = await sql`
+      INSERT INTO books (user_id, book_title) VALUES (${writerId}, ${bookTitle}) RETURNING book_id
+    `;
+
+    const parsedBookId = CrateBookSuccessRetBookIdSchema.safeParse(bookId[0].book_id);
+    if (!parsedBookId.success) {
+      console.error("invalid ret: ", parsedBookId.error);
+      return {
+        success: false,
+        errors: parsedBookId.error.errors.map(e => e.message)
+      }
+    }
+
+    return {
+      success: true,
+      bookId: parsedBookId.data
+    };
+  } catch (error) {
+    console.error("SSW: ", error);
+
+    return {
+      success: false,
+      errors: [ERROR.SOMETHING_WENT_WRONG_ERROR]
+    };
+  }
+}
+
+// update a book title
+const UpdateBookTitleParamSchema = z.object({
+  bookId: BookSchema.shape.book_id,
+  bookTitle: BookSchema.shape.book_title
 });
+type UpdateBookTitleParam = z.infer<typeof UpdateBookTitleParamSchema>;
+type UpdateBookTitleSuccessRet = {
+  success: true
+}
+type UpdateBookTitleFailureRet = {
+  success: false
+  errors: string[]
+}
+type UpdateBookTitleRet = UpdateBookTitleSuccessRet | UpdateBookTitleFailureRet;
+export const updateBookTitleASF = async (param: UpdateBookTitleParam): Promise<UpdateBookTitleRet> => {
+  'use server';
+
+  try {
+    const writer = await getAuthenticatedUserASF();
+    if (!writer) {
+      console.error(UNAUTHENTICATED_ERROR, writer);
+      return {
+        success: false,
+        errors: [UNAUTHENTICATED_ERROR]
+      }
+    }
+
+    const parsedParam = UpdateBookTitleParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      return {
+        success: false,
+        errors: parsedParam.error.errors.map(e => e.message)
+      }
+    }
+
+    const writerId = writer.user_id;
+    const { bookId, bookTitle } = parsedParam.data;
+
+    const res = await sql`
+      UPDATE books
+      SET book_title = ${bookTitle}, updated_at = CURRENT_TIMESTAMP
+      WHERE book_id = ${bookId} AND user_id = ${writerId}
+      RETURNING book_id
+    `;
+
+    if (res.length !== 1) {
+      console.error("SWW: ", res);
+      return {
+        success: false,
+        errors: [ERROR.SOMETHING_WENT_WRONG_ERROR]
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("SSW: ", error);
+
+    return {
+      success: false,
+      errors: [ERROR.SOMETHING_WENT_WRONG_ERROR]
+    };
+  }
+}
+{/* write end */}
+
+
+const SubscribeParamSchema = UserSchema.shape.user_id;
 type SubscribeParam = z.infer<typeof SubscribeParamSchema>;
 const SubscribeRetSchema = z.boolean();
 export type SubscribeRet = z.infer<typeof SubscribeRetSchema>;
-export const subscribeToggleSF = async (param: SubscribeParam): Promise<SubscribeRet> => {
+export const subscribeToggleASF = async (param: SubscribeParam): Promise<SubscribeRet> => {
   "use server";
 
-  try{
+  try {
+    const user = await getAuthenticatedUserASF();
+    if (!user) {
+      console.error(UNAUTHENTICATED_ERROR, user);
+      return false;
+    }
+
     const parsedParam = SubscribeParamSchema.safeParse(param);
     if (!parsedParam.success) {
-      console.error("invalid param in subscribeSF", parsedParam);
+      console.error("invalid param in subscribeASF", parsedParam.error);
       return false;
     }
   
-    const { userId, authorId } = parsedParam.data;
-    console.log(parsedParam.data)
-    const ret = await sql`
+    const authorId = parsedParam.data;
+    const userId = user.user_id;
+
+    await sql`
       WITH del AS (
-    DELETE FROM subscribes 
-    WHERE user_id_subscribed = ${authorId} AND user_id_subscribing = ${userId}
-    RETURNING user_id_subscribed
-  )
-  INSERT INTO subscribes (user_id_subscribed, user_id_subscribing)
-  SELECT ${authorId}, ${userId}
-  WHERE NOT EXISTS (SELECT 1 FROM del)
-      `;
-      console.log(ret);
+        DELETE FROM subscribes 
+        WHERE user_id_subscribed = ${authorId} AND user_id_subscribing = ${userId}
+        RETURNING user_id_subscribed
+      )
+      INSERT INTO subscribes (user_id_subscribed, user_id_subscribing)
+      SELECT ${authorId}, ${userId}
+      WHERE NOT EXISTS (SELECT 1 FROM del)
+    `;
+
     return true;
   } catch(error) {
-    console.log(error);
+    console.error("SWW in subscribeASF", error);
     return false;
   }
 }
 
-{/*
-  if (ret.length === 0) {
-        return {
-          success: false,
-          errorCode: ERROR_CODE.NOT_FOUND
-        }
-      }
-  
-      const parsedRet = GetAuthorCardDataRetSchema.safeParse(ret[0]);
-      if (ret.length !== 1 || !parsedRet.success) {
-        console.error("invalid ret in getAuthorCardDataSF", parsedRet);
-        return {
-          success: false,
-          errorCode: ERROR_CODE.INVALID_DATA
-        }
-      }
-  
-      return {
-        success: true,
-        authorCardData: parsedRet.data
-      }
-    } catch(error) {
-      console.error("Something went wrong in getAuthorCardDataSF", error);
-      return {
-        success: false,
-        errorCode: ERROR_CODE.NETWORK_PROBLEM
-      };
+{/* is author series start */}
+// is author series: is book author
+const IsBooAuthorParamSchema = BookSchema.shape.book_id;
+type IsBooAuthorParam = z.infer<typeof IsBooAuthorParamSchema>;
+const IsBooAuthorRetSchema = z.boolean();
+export type IsBooAuthorRet = z.infer<typeof IsBooAuthorRetSchema>;
+export const isBooAuthorASF = async (param: IsBooAuthorParam): Promise<IsBooAuthorRet> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      console.error(UNAUTHENTICATED_ERROR, reader);
+      return false;
     }
-  */}
+
+    const parsedParam = IsBooAuthorParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param in isReaderIsAuthorASF", parsedParam.error);
+      return false;
+    }
+  
+    const bookId = parsedParam.data;
+    const readerId = reader.user_id;
+
+    const ret = await sql`
+      SELECT EXISTS (
+        SELECT 1 
+        FROM books 
+        WHERE book_id = ${bookId} AND user_id = ${readerId}
+      ) AS is_reader_is_author
+    `;
+
+    if (ret.length !== 1) {
+      console.error("invalid ret length in isReaderIsAuthorASF", ret);
+      return false;
+    }
+
+    const parsedRet = IsBooAuthorRetSchema.safeParse(ret[0].is_reader_is_author);
+    if (!parsedRet.success) {
+      console.error("invalid ret in isReaderIsAuthorASF", ret);
+      return false;
+    }
+
+    return parsedRet.data;
+  } catch(error) {
+    console.error("SWW in isReaderIsAuthorASF", error);
+    return false;
+  }
+}
+
+// is author series: is page author
+const IsPagAuthorParamSchema = PageSchema.shape.page_id;
+type IsPagAuthorParam = z.infer<typeof IsPagAuthorParamSchema>;
+const IsPagAuthorRetSchema = z.boolean();
+export type IsPagAuthorRet = z.infer<typeof IsPagAuthorRetSchema>;
+export const isPagAuthorASF = async (param: IsPagAuthorParam): Promise<IsPagAuthorRet> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      console.error(UNAUTHENTICATED_ERROR, reader);
+      return false;
+    }
+
+    const parsedParam = IsPagAuthorParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      return false;
+    }
+  
+    const readerId = reader.user_id;
+    const pageId = parsedParam.data;
+
+    const ret = await sql`
+      SELECT EXISTS (
+        SELECT 1 
+        FROM pages 
+        WHERE page_id = ${pageId} AND user_id = ${readerId}
+      ) AS is_author
+    `;
+
+    if (ret.length !== 1) {
+      console.error("invalid ret: ", ret);
+      return false;
+    }
+
+    const parsedRet = IsPagAuthorRetSchema.safeParse(ret[0].is_author);
+    if (!parsedRet.success) {
+      console.error("invalid ret: ", ret);
+      return false;
+    }
+
+    return parsedRet.data;
+  } catch(error) {
+    console.error("SWW: ", error);
+    return false;
+  }
+}
+{/* is author series end */}
+
+const DeleteBookAndInPagesParamSchema = BookSchema.shape.book_id;
+type DeleteBookAndInPagesParam = z.infer<typeof DeleteBookAndInPagesParamSchema>;
+const DeleteBookAndInPagesRetSchema = BookSchema.shape.book_id.nullable();
+export type DeleteBookAndInPagesRet = z.infer <typeof DeleteBookAndInPagesRetSchema>;
+export const deleteBookAndInPagesASF = async (param: DeleteBookAndInPagesParam): Promise<DeleteBookAndInPagesRet> => {
+  "use server";
+
+  let successFlag = false;
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      console.error(UNAUTHENTICATED_ERROR, reader);
+      return null;
+    }
+
+    const parsedParam = DeleteBookAndInPagesParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param in deleteBookAndInPagesASF", parsedParam.error);
+      return null;
+    }
+  
+    const readerId = reader.user_id;
+    const bookId = parsedParam.data;
+
+    const ret = await sql`
+      DELETE
+      FROM books
+      WHERE book_id = ${bookId}
+        AND user_id = ${readerId}
+      RETURNING book_id
+    `;
+
+    if (ret.length !== 1) {
+      console.error("invalid ret length in deleteBookAndInPagesASF", ret);
+      return null;
+    }
+
+    const parsedRet = DeleteBookAndInPagesRetSchema.safeParse(ret[0].book_id);
+    if (!parsedRet.success) {
+      console.error("invalid ret in deleteBookAndInPagesASF", parsedRet.error);
+      return null;
+    }
+
+    successFlag = true;
+
+    revalidatePath(`/@${readerId}/books/${bookId}`);
+    revalidatePath(`/@${readerId}/books`);
+
+    redirect(`/@${readerId}/books`);
+  } catch(error) {
+    if (error instanceof Error &&
+      'digest' in error &&
+      typeof error.digest === 'string' &&
+      error.digest.startsWith('NEXT_REDIRECT')) {
+
+      throw error;
+    }
+
+    console.error("SWW in deleteBookAndInPagesASF", error);
+
+    if (successFlag) {
+      return param;
+    }
+
+    return null;
+  }
+}
 {/* neon end */}
 
 {/* cloudinary start */}

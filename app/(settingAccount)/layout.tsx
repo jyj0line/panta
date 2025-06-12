@@ -1,27 +1,33 @@
-"use client";
+import { getAuthenticatedUserASF } from '@/app/lib/SFs/afterAuthSFs';
+import { StickyDiv } from '@/app/components/divs/StickyDiv';
+import { Header } from '../components/common/Header';
 
-import { SessionProvider } from 'next-auth/react';
-
-import { SessCtxedUserProvider } from '@/app/lib/contexts/SessCtxedUserContext';
-import { SCtxedUCtxedStickyHeader } from '@/app/components/common/SCtxedUCtxedStickyHeader';
-
-const SettingLayout = ({
+const SettingLayout = async ({
   children,
 }: {
   children: React.ReactNode
 }) => {
+  const user = await getAuthenticatedUserASF();
+
   return(
-    <SessionProvider>
-      <SessCtxedUserProvider>
-        <div className='relative flex flex-col min-h-dvh'>
-          <SCtxedUCtxedStickyHeader showSearch={true} authorId={null} className="little_container h-[3rem] p-[0.5rem]" />
-          
-          <div className="small_container flex justify-center items-center flex-1 px-[1rem] py-[2rem]">
-            {children}
-          </div>
+    <div className='relative flex flex-col min-h-dvh'>
+      <StickyDiv>
+        <Header
+          showSearch={true}
+          authorId={null}
+          className="little_container h-[3rem] p-[0.5rem]"
+          userMenuProps={{
+            user: user,
+            isUserFirstLoading: false,
+            className: "h-full"
+          }}
+        />
+        </StickyDiv>
+
+        <div className="small_container flex justify-center items-center flex-1 p-[2rem]">
+          {children}
         </div>
-      </SessCtxedUserProvider>
-    </SessionProvider>
+    </div>
   )
 };
 export default SettingLayout;

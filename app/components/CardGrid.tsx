@@ -1,14 +1,14 @@
 "use client";
-import { useInfiniteScroll, useIntersectionObserver, InfiniteScrollProps } from '@/app/lib/hooks';
+import { useInfiniteScroll, useIntersectionObserver, UseInfiniteScrollProps } from '@/app/lib/hooks';
 import { Card, CardLoading } from "@/app/components/Card";
 import type { CardType } from '@/app/lib/sqls'
 import { sqlSelectCards } from '@/app/lib/sqls'
-import { Empty, End, Error} from '@/app/components/InformDataState'
+import { Empty, End, Error} from '@/app/components/leaves/InformDataState'
 
-const SCROLL_OPTIONS: InfiniteScrollProps<Record<string, unknown>, CardType | null> = {
-  selectItems: sqlSelectCards,
-  request: {},
-  chunkSize: 24,
+const SCROLL_OPTIONS: UseInfiniteScrollProps<Record<string, unknown>, CardType | null> = {
+  getItems: sqlSelectCards,
+  req: {},
+  limit: 24,
   initialChunk: 1,
   loadInitialData: true,
   onError: () => {
@@ -16,7 +16,7 @@ const SCROLL_OPTIONS: InfiniteScrollProps<Record<string, unknown>, CardType | nu
   }
 };
 
-const loadingPlaceholders = Array.from({ length: SCROLL_OPTIONS.chunkSize }, (_, i) => (
+const loadingPlaceholders = Array.from({ length: SCROLL_OPTIONS.limit }, (_, i) => (
   <CardLoading key={`loading-${i}`} />
 ));
 

@@ -1,10 +1,4 @@
-import { type Metadata } from "next";
-
-import { ChangePasswordForm } from "@/app/components/settingAccount/ChangePasswordForm";
-
-export const metadata: Metadata = {
-  title: 'Change Password'
-};
+import { ChangePasswordForm } from "@/app/components/groSettingAccount/ChangePasswordForm";
 
 const ChangepasswordPage = () => {
   return (

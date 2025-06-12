@@ -4,13 +4,17 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: '/@:authorId/books/:bookId',
+        destination: '/authorId/:authorId/books/:bookId',
+      },
+      {
         source: '/@:authorId/:pageId',
         destination: '/authorId/:authorId/:pageId',
       },
       {
         source: '/@:authorId',
         destination: '/authorId/:authorId',
-      },
+      }
     ];
   },
 

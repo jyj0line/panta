@@ -42,7 +42,7 @@ export const getUserSF = async(user_id: GetUserParam): Promise<GetUserRet | null
     } catch (_) {
       return null;
     }
-  }
+}
 
 // select profile image url
 const SelectProfileImageUrlParamSchema = UserSchema.shape.user_id;

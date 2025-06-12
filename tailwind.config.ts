@@ -27,6 +27,7 @@ export default {
       },
       gridTemplateColumns: {
         'card-grid': 'repeat(auto-fit, minmax(18rem, auto))',
+        'books-grid': 'repeat(auto-fit, minmax(15rem, auto))'
       }, 
       keyframes: {
         'opacity-loading': {

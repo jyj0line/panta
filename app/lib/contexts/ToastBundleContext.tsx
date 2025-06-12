@@ -60,8 +60,8 @@ export const ToastBundleProvider = ({ children }: { children: React.ReactNode })
         if (isStacked) {
             newToastId = lastToast.toastId;
 
-            setToasts(prevToasts => {
-                const newToasts = [...prevToasts];
+            setToasts(() => {
+                const newToasts = [...toasts];
 
                 const lastIndex = newToasts.length - 1;
                 newToasts[lastIndex] = {

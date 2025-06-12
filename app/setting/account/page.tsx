@@ -1,11 +1,5 @@
-import { type Metadata } from "next";
-
 import type { LinkItem } from "@/app/components/setting/SettingContainer";
 import { SettingContainer } from "@/app/components/setting/SettingContainer";
-
-export const metadata: Metadata = {
-  title: 'Setting: Account'
-};
 
 const ACCOUNT_SECURITY_LINK_ITMES: LinkItem[] = [
     {href: "/changepassword", description: "Change password"}

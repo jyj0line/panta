@@ -1,22 +1,22 @@
 import { type Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { SessionProvider } from 'next-auth/react';
 
+import { getAuthenticatedUserASF } from '@/app/lib/SFs/afterAuthSFs';
 import { isExistentUserIdSF } from "@/app/lib/SFs/publicSFs";
-import { SessCtxedUserProvider } from '@/app/lib/contexts/SessCtxedUserContext';
-import { SCtxedUCtxedStickyHeader } from '@/app/components/common/SCtxedUCtxedStickyHeader';
+import { StickyDiv } from '@/app/components/divs/StickyDiv';
+import { Header } from '@/app/components/common/Header';;
 
 import { METADATA } from '@/app/lib/constants';
 const {
   NOT_FOUND_TITLE_METADATA
 } = METADATA;
 
-type AuthorIdDynamicMetadataProps = {
+type GenerateMetadataParam = {
   params: Promise<{ authorId: string }>
 }
 
 export const generateMetadata = async (
-  { params }: AuthorIdDynamicMetadataProps
+  { params }: GenerateMetadataParam
 ): Promise<Metadata> => {
   const ps = await params;
   const authorId = ps.authorId;
@@ -32,35 +32,38 @@ export const generateMetadata = async (
   }
 };
 
-const AuthorIdDynamicLayout = async ({
+const DynAuthorIdLayout = async ({
   params,
   children
 }: {
   params: Promise<{ authorId: string }>
   children: React.ReactNode
 }) => {
-  const ps = await params;
-  const authorId = ps.authorId;
-  const isExistentUserId = await isExistentUserIdSF(authorId);
+  const { authorId } = await params;
+  const [ isExistentUserId, readerId ] = await Promise.all([
+    isExistentUserIdSF(authorId),
+    getAuthenticatedUserASF()
+  ]);
 
   if (!isExistentUserId) notFound();
-  
-  return(
-    <div className='relative'>
-      <SessionProvider>
-        <SessCtxedUserProvider>
-          <SCtxedUCtxedStickyHeader
-            showSearch={true}
-            authorId={authorId}
-            className="little_container h-[3rem] p-[0.5rem]"
-          />
-        </SessCtxedUserProvider>
-      </SessionProvider>
 
-      <div className='small_container p-[2rem]'>
-        {children}
-      </div>
+  return(
+    <div className='relative flex flex-col min-h-dvh'>
+      <StickyDiv>
+        <Header
+          showSearch={true}
+          authorId={authorId}
+          className="little_container h-[3rem] p-[0.5rem]"
+          userMenuProps={{
+            user: readerId,
+            isUserFirstLoading: false,
+            className: 'h-full'
+          }}
+        />
+      </StickyDiv>
+
+      {children}
     </div>
   );
 }
-export default AuthorIdDynamicLayout;
+export default DynAuthorIdLayout;

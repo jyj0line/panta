@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { genSignatureSF, updateProfileImageUrlASF, deleteProfileImageUrlASF, deleteProfileImageFileSF } from "@/app/lib/SFs/afterAuthSFs";
 import { uploadImageCF } from "@/app/lib/publicCFs";
-import { useSessCtxedUserContext } from "@/app/lib/contexts/SessCtxedUserContext";
+import { useSCtxedUserContext } from "@/app/lib/contexts/SCtxedUserContext";
 import { useToastBundleContext, makeToastOrder } from "@/app/lib/contexts/ToastBundleContext";
 import { ProfileImageSelector } from "@/app/components/leaves/ProfileImageSelector";
 import { IngButton } from "@/app/components/leaves/IngButton";
@@ -58,7 +58,7 @@ type ProfileImageFormProps = {
 }
 export const ProfileImageForm = ({ className="h-[10rem]" }: ProfileImageFormProps) => {
     const {addToast} = useToastBundleContext();
-    const { user, isUserFirstLoading, updateSessionUser } = useSessCtxedUserContext();
+    const { user, isUserFirstLoading, updateSessionUser } = useSCtxedUserContext();
 
     const [newProfileImageFile, setNewProfileImageFile] = useState<File | null>(null);
     const [newPreviewUrl, setNewPreviewUrl] = useState<string | null>(null);

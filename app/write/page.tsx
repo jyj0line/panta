@@ -9,9 +9,9 @@ import {
   selectWritePageASF,
   selectWriteBooksASF
 } from '@/app/lib/SFs/afterAuthSFs';
-import { ToastBundleProvider } from '@/app/lib/contexts/ToastBundleContext';
+import { type SearchParams } from "@/app/lib/utils";
 import { WriteForm } from '@/app/components/write/WritieForm';
-import { parseString } from '@/app/lib/utils';
+import { parseSPVString } from '@/app/lib/utils';
 
 import { METADATA } from '@/app/lib/constants';
 const {
@@ -19,14 +19,14 @@ const {
 } = METADATA;
 
 type MetadataProps = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: Promise<SearchParams>
 }
 
 export const generateMetadata = async (
   { searchParams }: MetadataProps
 ): Promise<Metadata> => {
   const sp = await searchParams;
-  const page_id = parseString(sp.page_id);
+  const page_id = parseSPVString(sp.page_id);
 
   if (page_id) {
     const title = await getWriteTitleASF(page_id);
@@ -44,18 +44,18 @@ export const generateMetadata = async (
 const WritePageIdPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: Promise<SearchParams>
 }) => {
-  const user = await getAuthenticatedUserASF();
-  if (!user || !user.user_id) redirect("/login");
+  const writer = await getAuthenticatedUserASF();
+  if (!writer || !writer.user_id) redirect("/login");
   
   const sp = await searchParams;
-  const page_id = parseString(sp.page_id);
+  const page_id = parseSPVString(sp.page_id);
 
   const [page, books]: [SelectWritePageRet, SelectWriteBooksRet] = await Promise.all([
     page_id ? selectWritePageASF({page_id}) : Promise.resolve({
       page_id: '',
-      user_id: user.user_id,
+      user_id: writer.user_id,
       book_id: '',
     
       title: '',
@@ -66,14 +66,12 @@ const WritePageIdPage = async ({
     }),
     selectWriteBooksASF()
   ]);
-  
+
   if (!page) notFound();
-  if (page.user_id !== user.user_id) notFound();
+  if (page.user_id !== writer.user_id) notFound();
 
   return (
-    <ToastBundleProvider>
-      <WriteForm page={page} books={books} />
-    </ToastBundleProvider>
+    <WriteForm page={page} initBooks={books} />
   );
 }
 export default WritePageIdPage;

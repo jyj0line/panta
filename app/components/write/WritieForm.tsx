@@ -10,20 +10,17 @@ import {
   updateWriteASF
 } from "@/app/lib/SFs/afterAuthSFs";
 import { useToastBundleContext } from '@/app/lib/contexts/ToastBundleContext';
-import { TextareaInput } from '@/app/components/leaves/TextareaInput';
-import { TokenInput } from '@/app/components/leaves/TokenInput';
-import { SelectInput } from '@/app/components/leaves/SelectInput';
+import { type WriteMode, WriteModeSelector } from "@/app/components/write/WriteModeSelector";
+import { WritePageForm } from '@/app/components/write/WritePageForm';
+import { WriteBooksForm } from '@/app/components/write/WriteBooksForm';
 import { WriteFormButtons } from '@/app/components/write/WriteFormButtons'
 
-import { METADATA, PAGE, ERROR } from '@/app/lib/constants';
+import { METADATA, ERROR } from '@/app/lib/constants';
+
 const {
   WRITE_TITLE_METADATA
 } = METADATA;
-const {
-  PAGE_TITLE_MAX,
-  PAGE_PREVIEW_MAX,
-  PAGE_CONTENT_MAX
-} = PAGE;
+
 const {
   PLEASE_TRY_AGAIN_LATER_ERROR,
 
@@ -33,11 +30,13 @@ const {
 
 type WriteFormProps= {
   page: SelectWritePageRet,
-  books: SelectWriteBooksRet
+  initBooks: SelectWriteBooksRet
 }
-export const WriteForm = ({ page, books }: WriteFormProps) => {
+export const WriteForm = ({ page, initBooks }: WriteFormProps) => {
   const { addToast } = useToastBundleContext();
   const { push } = useRouter();
+
+  const [mode, setMode] = useState<WriteMode>("page");
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -46,6 +45,8 @@ export const WriteForm = ({ page, books }: WriteFormProps) => {
   const [tag_ids, setTag_ids] = useState<string[]>(page.tag_ids)
   const [content, setContent] = useState<string>(page.content);
   const [book_id, setBook_id] = useState<string>(page.book_id ?? '');
+
+  const [books, setBooks] = useState<SelectWriteBooksRet>(initBooks);
 
   const handleSubmit = async (): Promise<void> => {
     if (isSubmitting) {
@@ -108,7 +109,6 @@ export const WriteForm = ({ page, books }: WriteFormProps) => {
             progressbarClassName: "bg-powerem"
           });
         } else {
-          console.log(createWriteRes)
           const errors = createWriteRes.errors;
           if (errors) {
             Object.values(errors).map((errs) => {
@@ -157,29 +157,25 @@ export const WriteForm = ({ page, books }: WriteFormProps) => {
   };
 
   useEffect(() => {
-    document.title = `${title} | Panta` || `${WRITE_TITLE_METADATA} | Panta`;
+    document.title = title ? `${title} | Panta` : `${WRITE_TITLE_METADATA} | Panta`;
   }, [title]);
 
   return (
-    <div className='container relative flex flex-col min-h-dvh bg-wh'>
+    <div className={'small_container relative flex flex-col min-h-dvh p-[0.5rem] bg-wh'}>
       {/* write form bar start */}
       <div
         className='
-          sticky top-[0px] flex flex-row items-center divide-x-[0.1rem] divide-sub
-          bg-background h-[2.5rem] border-b-[0.1rem] border-sub
+          sticky top-[0px] flex flex-row justify-between items-center divide-x-[0.1rem] divide-sub
+          bg-wh h-[2.5rem] border-b-[0.1rem] border-sub z-[10]
         '
       >
-        <SelectInput
-          name="book_id"
-          options={books.map(book => ({
-            id: book.book_id,
-            title: book.book_title,
-          }))}
-          selectedOptionId={book_id}
-          blankTitle='not in a book'
-          onChange={setBook_id}
-          className='h-full px-[1rem]'
+        <WriteModeSelector
+          currentMode={mode}
+          onClickPage={() => { setMode("page") }}
+          onClickBooks={() => { setMode("books") }}
+          className='h-full'
         />
+
         <WriteFormButtons
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
@@ -190,46 +186,27 @@ export const WriteForm = ({ page, books }: WriteFormProps) => {
       {/* write form bar end */}
 
       {/* write form inputs start */}
-      <div className='flex flex-col flex-1'>
-        <input type="hidden" name="page_id" value={page.page_id} />
-
-        <TextareaInput
-          name="title"
-          value={title}
-          placeholder="title"
-          maxLength={PAGE_TITLE_MAX}
-          onChange={(e) => setTitle(e.target.value)}
-          className="text-[2rem] font-[600]"
-        />
-
-        <TextareaInput
-          name="preview"
-          value={preview}
-          placeholder="preview"
-          maxLength={PAGE_PREVIEW_MAX}
-          onChange={(e) => setPreview(e.target.value)}
-        />
-        
-        <TokenInput
-          name="tag_ids"
-          tokens={tag_ids}
-          setTokens={setTag_ids}
-          placeholder={"tag"}
-          className='bg-wh'
-          tokensClassName='gap-[0.5rem] p-[0.5rem]'
-          tokenClassName='p-[0.5rem] border-[0.1rem] border-em'
-          inputClassName='textarea'
-        />
-
-        <TextareaInput
-          name="content"
-          value={content}
-          placeholder="content"
-          maxLength={PAGE_CONTENT_MAX}
-          onChange={(e) => setContent(e.target.value)}
-          className='grow'
-        />
-      </div>
+      {mode === "page"
+      ? <WritePageForm
+        page_id={page.page_id}
+        books={books}
+        book_id={book_id}
+        setBook_id={setBook_id}
+        title={title}
+        setTitle={setTitle}
+        preview={preview}
+        setPreview={setPreview}
+        content={content}
+        setContent={setContent}
+        tag_ids={tag_ids}
+        setTag_ids={setTag_ids}
+        className="flex-1"
+      />
+      : <WriteBooksForm
+        books={books}
+        setBooks={setBooks}
+        className="flex-1 self-center flex items-center w-full max-w-[30rem]"
+      />}
       {/* write form inputs start */}
     </div>
   );

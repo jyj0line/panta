@@ -4,7 +4,7 @@ import { useState, useActionState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { loginRedirectSF } from '@/app/lib/SFs/publicSFs';
-import { IdInput } from '@/app/components/leaves/IdInput';
+import { TextInput } from '@/app/components/leaves/TextInput';
 import { PasswordInput } from '@/app/components/leaves/PasswordInput';
 import { CheckBox } from '@/app/components/leaves/CheckBox';
 import { PrefixedMessage } from '@/app/components/leaves/PrefixedMessage';
@@ -45,7 +45,7 @@ export const LoginForm = () => {
       
       {/* form inputs start */}
       <div className='flex flex-col gap-[0.2rem] w-full'>
-        <IdInput
+        <TextInput
           name="user_id"
           value={userId}
           placeholder="Enter your ID"

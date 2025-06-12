@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 import { ProfileImageSchema } from '@/app/lib/tables';
-import { SelectImageSVG } from '@/app/lib/svgs';
+import { SelectImageSvg } from '@/app/lib/svgs';
 
 import { ERROR, DEFAULT, COMMON } from '@/app/lib/constants';
 const {
@@ -117,6 +117,12 @@ export const ProfileImageSelector = ({
     newProfileImageFileInputRef.current?.click();
   };
   
+  useEffect(() => {
+    return () => {
+      cidRef.current = 0;
+    }
+  }, []);
+  
   return (
     <div
       className={`${isIng ? 'pointer-events-none' : ''} ${className}`}
@@ -156,7 +162,7 @@ export const ProfileImageSelector = ({
               min-w-[2rem] w-[10%] h-auto aspect-square p-[0.1rem] rounded-full border-[0.1rem] border-sub
             "
           >
-            <SelectImageSVG />
+            <SelectImageSvg />
           </button>
 
           {newPreviewUrl &&

@@ -32,9 +32,9 @@ export const SelectInput = ({
             className={`relative w-full cursor-pointer ${className}`}
         >
             <div className='flex flex-row justify-between items-center h-full'>
-                <input type="hidden" name={name} value={selectedOptionId}></input>
-                <div className='flex-1'>
-                    {options.find(opt => opt.id === selectedOptionId)?.title  ?? blankTitle}
+                <input type="hidden" name={name} value={selectedOptionId || ''}></input>
+                <div className='flex-1 truncate'>
+                    {options.find(opt => opt.id === selectedOptionId)?.title ?? blankTitle}
                 </div>
                 {isVisible ?
                 <ArrowDropupSvg className='w-auto h-[20%] aspect-[2/1]' />:
@@ -42,10 +42,19 @@ export const SelectInput = ({
             </div>
 
             {isVisible &&
-            <ul className='absolute left-[0px] top-[100%] flex flex-col w-full h-full bg-wh shadow-lg z-[10]'>
+            <ul
+                className='
+                    absolute left-[0px] top-[100%] flex flex-col
+                    w-full max-h-[25rem] bg-wh border-[0.1rem] border-supersub
+                    overflow-y-auto hide_scrollbar
+                '
+            >
                 <li
                     onClick={() => onChange('')}
-                    className={`flex flex-row items-center h-full px-[1rem] ${selectedOptionId === '' ? 'bg-supersub' : ''}`}
+                    className={`
+                        flex flex-row items-center truncate
+                        ${className} ${selectedOptionId === '' ? 'bg-supersub' : ''}
+                    `}
                 >
                     {blankTitle}
                 </li>
@@ -53,7 +62,10 @@ export const SelectInput = ({
                 <li
                     key={opt.id}
                     onClick={() => onChange(opt.id)}
-                    className={`flex flex-row items-center h-full px-[1rem] ${selectedOptionId === opt.id ? 'bg-supersub' : ''}`}
+                    className={`
+                        flex flex-row items-center truncate
+                        ${className} ${selectedOptionId === opt.id ? 'bg-supersub' : ''}
+                    `}
                 >
                     {opt.title}
                 </li>

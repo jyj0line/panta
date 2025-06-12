@@ -44,14 +44,15 @@ export const WriteFormButtons = ({
         >
           <CloseSvg className="w-auto h-[40%] aspect-sqaure stroke-[10]"/>
         </button>
+
         {isVisible && (
-        <div className='fixed inset-0 z-[50] border-[0px]'>
+        <div className='fixed inset-0 z-[50]'>
           <div
             ref={ref}
             className="
               relative left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%]
-              flex flex-col justify-center items-center
-              bg-background w-full sm:w-[30rem] h-[20rem] p-[2rem] rounded-[0.5rem] shadow-lg z-[50]
+              flex flex-col justify-center items-center bg-background w-full sm:w-[30rem] h-[20rem]
+              p-[2rem] rounded-[0.5rem] border-[0.1rem] border-supersub
             "
           >
             <h3 className="text-[2rem] text-center font-[600] p-[0.5rem]">Confirm Exit</h3>
@@ -81,8 +82,7 @@ export const WriteFormButtons = ({
               </button>
             </div>
           </div>
-        </div>
-        )}
+        </div>)}
       </div>
   );
 }
