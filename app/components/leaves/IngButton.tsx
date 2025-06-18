@@ -24,7 +24,10 @@ export const IngButton = ({
             type={type}
             disabled={isIng}
             aria-disabled={isIng}
-            onClick={onClick}
+            onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+            }}
             className={`
                 relative rounded-[0.5rem]
                 ${isIng

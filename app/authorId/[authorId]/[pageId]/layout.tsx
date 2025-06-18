@@ -17,11 +17,18 @@ export const generateMetadata = async (
 
   if (pageTitle === null) {
     return {
-      title: METADATA.NOT_FOUND_TITLE_METADATA
+      title: {
+        template: '%s | Panta',
+        default: METADATA.NOT_FOUND_TITLE_METADATA
+      }
     }
   }
+
   return {
-    title: `${pageTitle} | Panta`
+    title: {
+      template: '%s | Panta',
+      default: pageTitle
+    }
   }
 };
 

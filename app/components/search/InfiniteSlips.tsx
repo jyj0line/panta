@@ -1,8 +1,9 @@
 "use client";
 
-import { type GetSlipsRes, type GetSlipsReq, unifiedGetSlipsSF } from '@/app/lib/SFs/publicSFs';
+import { type GetSlipsReq, unifiedGetSlipsSF } from '@/app/lib/SFs/publicSFs';
+import { type ClassNamesProps, type GetSlipsRes } from "@/app/lib/utils";
 import { InfiniteItems } from "@/app/components/common/InfiniteItems";
-import { type SlipProps, Slip, SlipsSkeleton } from '@/app/components/leaves/Slip';
+import { type SlipProps, type SlipSkeletonProps, Slip, SlipSkeletion } from '@/app/components/leaves/Slip';
 import { Empty, End, Error } from '@/app/components/leaves/InformDataState';
 
 import { WORD_BLOCK } from "@/app/lib/constants";
@@ -11,38 +12,38 @@ const LIMIT = 12;
 
 type InfiniteSlipsProps = {
   searchReq: GetSlipsReq
-  className?: string
-  itemContainerClassName?: string
-};
+} & ClassNamesProps;
 
-export const InfiniteSlips = ({ searchReq, className, itemContainerClassName }: InfiniteSlipsProps) => {
+export const InfiniteSlips = ({ searchReq, className, itemsContainerClassName, itemClassName }: InfiniteSlipsProps) => {
   return (
-    <InfiniteItems<GetSlipsReq, GetSlipsRes, Omit<SlipProps, keyof GetSlipsRes>>
+    <InfiniteItems<GetSlipsReq, GetSlipsRes, Omit<SlipProps, keyof GetSlipsRes>, SlipSkeletonProps>
       getItems={unifiedGetSlipsSF}
       req={{ ...searchReq }}
       limit={LIMIT}
 
-      renderItem={(searchSlip, additionalProps) => (
+      renderItem={(searchSlip, additionalProps, itemClassName) => (
         <Slip
           key={searchSlip.page_id} 
           {...searchSlip}
           {...additionalProps}
+          className={`${additionalProps?.className ?? ''} ${itemClassName}`}
         />
       )}
-      additionalProps={{}}
+      additionalItemProps={{}}
 
-      LoadingComponent={SlipsSkeleton}
+      LoadingComponent={SlipSkeletion}
       EmptyComponent={Empty}
       ErrorComponent={Error}
       EndComponent={End}
 
-      loadingProps={{ limit: LIMIT, className: itemContainerClassName }}
+      loadingProps={{}}
       emptyProps={{ heading: `No ${WORD_BLOCK.SEARCH_SLIPS_UPPER}`, para: `There are no ${WORD_BLOCK.SEARCH_SLIPS_LOWER}.` }}
       errorProps={{ heading: 'Error', para: 'Something went wrong.' }}
       endProps={{ heading: `All ${WORD_BLOCK.SEARCH_SLIPS_UPPER} loaded`, para: `There are no more ${WORD_BLOCK.SEARCH_SLIPS_LOWER}.` }}
       
       className={className}
-      itemContainerClassName={itemContainerClassName}
+      itemsContainerClassName={itemsContainerClassName}
+      itemClassName={itemClassName}
     />
   )
 };

@@ -1,7 +1,10 @@
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Delete Account'
+  title: {
+    template: '%s | Panta',
+    default: 'Delete Account'
+  }
 };
 
 const DeleteAccountLayout = ({

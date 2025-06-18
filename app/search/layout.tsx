@@ -1,6 +1,15 @@
+import type { Metadata } from 'next';
+
 import { getAuthenticatedUserASF } from '@/app/lib/SFs/afterAuthSFs';
 import { StickyDiv } from '@/app/components/divs/StickyDiv';
 import { Header } from '../components/common/Header';
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Panta',
+    default: 'Search'
+  }
+};
 
 const SearchLayout = async ({
   children,
@@ -15,7 +24,7 @@ const SearchLayout = async ({
         <Header
           showSearch={true}
           authorId={null}
-          className="little_container h-[3rem] p-[0.5rem]"
+          className="little_container h-[3rem] py-[0.5rem]"
           userMenuProps={{
             user: user,
             isUserFirstLoading: false,
@@ -24,7 +33,7 @@ const SearchLayout = async ({
         />
         </StickyDiv>
 
-        <div className="small_container flex flex-1 p-[2rem]">
+        <div className="flex-1 flex flex-col small_container p-[2rem]">
           {children}
         </div>
     </div>

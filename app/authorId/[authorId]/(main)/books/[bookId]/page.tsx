@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { isBooAuthorASF } from '@/app/lib/SFs/afterAuthSFs';
 import { isExistentBookIdSF, getBookTitleSF } from '@/app/lib/SFs/publicSFs';
 import { type SearchParams, parseSPVNaturalNumber, parseSPVOrderDirection } from '@/app/lib/utils';
-import { Breadcrumbs } from '@/app/components/leaves/Breadcrumbs';
+import { Breadcrumbs } from '@/app/components/dynAuthorId/Breadcrumbs';
 import { BookCriticalDropdown } from '@/app/components/dynAuthorId/BookCriticalDropdown';
 import { SlipsModeSelector } from '@/app/components/leaves/SlipsModeSelector';
 import { SlipsDirectionSelector } from '@/app/components/dynAuthorId/SlipsDirectionSelector';
@@ -68,12 +68,14 @@ const DynBookIdPage = async ({
         p={p}
         searchReq={{bookId: bookId, orderDirectioin: od}}
         className='w-full py-[1.5rem]'
-        itemContainerClassName='divide-y-[0.1rem] divide-y-superdupersub'
+        itemsContainerClassName='divide-y-[0.1rem] divide-y-superdupersub'
+        itemClassName="h-[17rem] py-[1rem]"
       />
       : <InfiniteBooSlips
         searchReq={{bookId: bookId, orderDirectioin: od}}
         className='w-full py-[1.5rem]'
-        itemContainerClassName='divide-y-[0.1rem] divide-y-superdupersub'
+        itemsContainerClassName='divide-y-[0.1rem] divide-y-superdupersub'
+        itemClassName="h-[17rem] py-[1rem]"
       />}
     </div>
   );

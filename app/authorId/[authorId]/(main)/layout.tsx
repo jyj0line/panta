@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { isExistentUserIdSF } from "@/app/lib/SFs/publicSFs";
-import { AuthorCard } from "@/app/components/common/AuthorCard";
+import { AuthorCard } from "@/app/components/dynAuthorId/AuthorCard";
 import { Tabs } from '@/app/components/leaves/Tabs';
 
 const DynAutGroMainLayout = async ({
@@ -29,7 +29,7 @@ const DynAutGroMainLayout = async ({
             className="gap-[0.5rem] h-[13rem] py-[1.5rem]"
         />
 
-        <Tabs tabs={authorIdTabs} className="justify-around h-[6rem] py-[1.5rem]"/>
+        <Tabs initTabs={authorIdTabs} className="justify-around h-[6rem] py-[1.5rem]"/>
 
         {children}
     </div>

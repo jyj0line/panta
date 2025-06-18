@@ -103,7 +103,9 @@ export const UserSchema = z.object({
     .nullable(),
   bio: z.string().max(USER_BIO_MAX, { message: `Bio must be no more than ${USER_BIO_MAX} characters long.` }),
   created_at: z.date(), // default current_timestamp
-  wrote_at: z.date() // default current_timestamp
+  wrote_at: z.date(), // default current_timestamp
+  sub_visited_at: z.date(), // default current_timestamp
+  like_visited_at: z.date() // default current_timestamp
 });
 export type User = z.infer<typeof UserSchema>;
 

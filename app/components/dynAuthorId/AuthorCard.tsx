@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Link from "next/link";
 
-import { SubscribeButton } from '@/app/components/leaves/SubscribeButton';
+import { SubscribeButton } from '@/app/components/dynAuthorId/SubscribeButton';
 
-import { getAuthenticatedUserASF } from '@/app/lib/SFs/afterAuthSFs';
-import { getAuthorCardDataSF, isSubscribingSF } from "@/app/lib/SFs/publicSFs";
+import { getAuthenticatedUserASF, isAuthorASF, isSubscribingASF } from '@/app/lib/SFs/afterAuthSFs';
+import { getAuthorCardDataSF } from "@/app/lib/SFs/publicSFs";
 
 import { DEFAULT } from '@/app/lib/constants';
 const {
@@ -22,9 +22,10 @@ export const AuthorCard = async ({
     showSubscribeInfo,
     className="h-[10rem]"
 }: AuthorCardProps) => {
-    const [ authorCardDataState, reader ] = await Promise.all([
+    const [authorCardDataState, isLoggedIn, isAuthor ] = await Promise.all([
         getAuthorCardDataSF(authorId),
-        getAuthenticatedUserASF()
+        getAuthenticatedUserASF().then(reader => reader !== null),
+        isAuthorASF(authorId)
     ]);
 
     if (!authorCardDataState.success) {
@@ -36,9 +37,8 @@ export const AuthorCard = async ({
     }
 
     const { profile_image_url, bio, subscribing_count, subscribed_count } = authorCardDataState.authorCardData;
-    const readerId = reader ? reader.user_id : null;
-    const isSubscribingInitial = readerId
-        ? await isSubscribingSF({authorId: authorId, readerId: readerId})
+    const isSubscribingInitial = isLoggedIn
+        ? await isSubscribingASF(authorId)
         : false
     ;
 
@@ -69,11 +69,12 @@ export const AuthorCard = async ({
             <div className='self-end flex flex-row justify-end items-center flex-wrap gap-[0.5rem]'>
                 <Link href={`/@${authorId}/subscribed`}  className='whitespace-pre-wrap'> {subscribed_count} subscribed </Link>
                 <Link href={`/@${authorId}/subscribing`} className='whitespace-pre-wrap'> {subscribing_count} subscribing </Link>
-                {(readerId && (authorId !== readerId)) &&
+                {!isAuthor &&
                 <SubscribeButton
+                    type="text"
                     isSubscribingInitial={isSubscribingInitial}
                     authorId={authorId}
-                    readerId={readerId}
+                    isLoggedIn={isLoggedIn}
                     className='h-[2rem]'
                 />
                 }

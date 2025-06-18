@@ -11,14 +11,14 @@ import {
   UnhashedPasswordSchema, DateStringParamSchema, DateStringRetSchema,
 } from '@/app/lib/tables';
 import {
-  OrderCriticSchema,
-  CQSchema,
+  OrderCriticSchema, OrderDirectionSchema,
+  CQSchema, type CQ,
   CSSchema,
-  OrderDirectionSchema
+  GetSlipsResSchema, GetSlipsRetSchema, type GetSlipsRet,
 } from "@/app/lib/utils";
 
 import { type ErrorCode, ERROR_CODE, SUCCESS, ERROR, COMMON } from '@/app/lib/constants';
-import { error } from 'console';
+import { redirect } from 'next/dist/server/api-utils';
 
 const {
   SIGN_UP_SUCCESS,
@@ -222,10 +222,6 @@ export const loginRedirectSF = async (prevState: LoginState | undefined, formDat
     }
     throw error;
   }
-};
-export const redirectLoginSF = async (): Promise<void> => {
-  "use server";
-  await signIn();
 };
 
 // logout
@@ -454,45 +450,6 @@ export const getAuthorCardDataSF = async (param: GetAuthorCardDataParam): Promis
   }
 }
 
-const IsSubscribedParamSchema = z.object({
-  authorId: UserSchema.shape.user_id,
-  readerId: UserSchema.shape.user_id
-});
-type IsSubscribedParam = z.infer<typeof IsSubscribedParamSchema>;
-const IsSubscribedRetSchema = z.boolean();
-type IsSubscribedRet = z.infer<typeof IsSubscribedRetSchema>;
-export const isSubscribingSF = async (param: IsSubscribedParam): Promise<IsSubscribedRet> => {
-  "use server";
-
-  try {
-    const parsedParam = IsSubscribedParamSchema.safeParse(param);
-    if (!parsedParam.success) {
-      console.error("invalid param in isSubscribed", parsedParam.error);
-      return false;
-    }
-
-    const {authorId, readerId} = parsedParam.data;
-
-    const ret = await sql`
-      SELECT EXISTS (
-        SELECT 1 
-        FROM subscribes 
-        WHERE user_id_subscribed = ${authorId} AND user_id_subscribing = ${readerId}
-      ) AS is_subscribed
-    `;
-
-    const parsedRet = IsSubscribedRetSchema.safeParse(ret[0].is_subscribed);
-    if (!parsedRet.success || ret.length !== 1) {
-      console.error("invalid ret in isSubscribed", parsedRet.error);
-      return false;
-    }
-
-    return parsedRet.data;
-  } catch(_) {
-    return false;
-  }
-}
-
 const GetAuthorCrumbDataParamSchema = UserSchema.shape.user_id;
 type GetAuthorCrumbDataParam = z.infer<typeof GetAuthorCrumbDataParamSchema>;
 const GetAuthorCrumbDataRetSchema = UserSchema.pick({
@@ -564,119 +521,49 @@ export const getAuthorCrumbDataSF = async (param: GetAuthorCrumbDataParam): Prom
 
 
 
-// chunked serires start
-// chunked serires: subscribes
-const GetSubscribesReqSchema = z.object({
-  authorId: UserSchema.shape.user_id,
-  readerId: UserSchema.shape.user_id.nullable(),
-  edOrIng: z.enum(["subscribed", "subscribing"]),
-});
-export type GetSubscribesReq = z.infer<typeof GetSubscribesReqSchema>;
-
-const GetSubscribesParamSchema = CQSchema.merge(GetSubscribesReqSchema);
-export type GetSubscribesParam = z.infer<typeof GetSubscribesParamSchema>;
-
-const GetSubscribeResSchema = z.object({
-  profile_image_url: UserSchema.shape.profile_image_url,
-  user_id: UserSchema.shape.user_id,
-  is_subscribing: z.boolean()
-});
-export type GetSubscribeRes = z.infer<typeof GetSubscribeResSchema>;
-
-const GetSubscribesRetSchema = CSSchema.merge(z.object({
-  items: z.array(GetSubscribeResSchema)
-}));
-export type GetSubscribesRet = z.infer<typeof GetSubscribesRetSchema>;
-export const getSubscribesSF = async (param: GetSubscribesParam): Promise<GetSubscribesRet> => {
-  "use server";
-
+// chunked series: get slips start
+// chunked series: get slips: get trend slips
+export const getTreSlipsSF = async (param: CQ): Promise<GetSlipsRet> => {
+  'use server';
+  
   try {
-    const parsedParam = GetSubscribesParamSchema.safeParse(param);
-    if (!parsedParam.success) {
-      console.error("invalid in getSubscribesSF", parsedParam.error);
-      throw new Error("invalid in getSubscribesSF");
+    const parseParam = CQSchema.safeParse(param);
+    if (!parseParam.success) {
+      console.error("invalid param: ", parseParam.error);
+      throw new Error("invalid param");
     }
 
-    const { authorId, readerId, edOrIng, chunk, limit } = parsedParam.data;
+    const { chunk, limit } = parseParam.data;
     const offset = chunk * limit;
 
-    const ret = edOrIng === "subscribing"
-    ? await sql`
-      WITH subscribing_users AS (
-        SELECT u.user_id, u.profile_image_url, 
-        CASE 
-          WHEN reader_sub.user_id_subscribing IS NOT NULL THEN true
-          ELSE false
-        END AS is_subscribing
-        FROM users u
-        INNER JOIN subscribes author_sub ON author_sub.user_id_subscribing = ${authorId}
-          AND u.user_id = author_sub.user_id_subscribed
-        LEFT JOIN subscribes reader_sub ON reader_sub.user_id_subscribing = ${readerId}
-        AND u.user_id = reader_sub.user_id_subscribed
-        ORDER BY u.wrote_at DESC, u.user_id
-      )
-      SELECT COUNT(*)::int AS total_count,
-        COALESCE(
-          (SELECT json_agg(result)
-            FROM (
-              SELECT *
-              FROM subscribing_users
-              OFFSET ${offset}
-              LIMIT ${limit}
-            ) result
-          ),
-          '[]'::json
-        ) AS results
-      FROM subscribing_users
-    ` : await sql `
-      WITH subscribed_users AS (
-        SELECT u.user_id, u.profile_image_url, 
-        CASE 
-          WHEN reader_sub.user_id_subscribing IS NOT NULL THEN true
-          ELSE false
-        END AS is_subscribing
-        FROM users u
-        INNER JOIN subscribes author_sub ON author_sub.user_id_subscribed = ${authorId}
-          AND u.user_id = author_sub.user_id_subscribing
-        LEFT JOIN subscribes reader_sub ON reader_sub.user_id_subscribing = ${readerId}
-        AND u.user_id = reader_sub.user_id_subscribed
-        ORDER BY u.wrote_at DESC, u.user_id
-      )
-      SELECT COUNT(*)::int AS total_count,
-        COALESCE(
-          (SELECT json_agg(result)
-            FROM (
-              SELECT *
-              FROM subscribed_users
-              OFFSET ${offset}
-              LIMIT ${limit}
-            ) result
-          ),
-          '[]'::json
-        ) AS results
-      FROM subscribed_users
+    const ret = await sql`
+      SELECT wp.page_id, p.title, p.preview, p.view, p."like", p.created_at::TEXT, u.user_id, u.profile_image_url,
+        COALESCE((SELECT array_agg(pt.tag_id) FROM pages_tags pt WHERE pt.page_id = wp.page_id), ARRAY[]::TEXT[]) AS tag_ids
+      FROM weekly_pages wp
+      JOIN pages p ON wp.page_id = p.page_id
+      JOIN users u ON p.user_id = u.user_id
+      ORDER BY wp.view DESC, wp.page_id ASC
+      OFFSET ${offset}
+      LIMIT ${limit}
     `;
-
-    const parsedRet = GetSubscribesRetSchema.safeParse({
-      items: ret[0].results,
-      totalCount: ret[0].total_count,
-      hasNextChunk: offset + ret[0].results.length < ret[0].total_count
+    
+    const parsedRet = GetSlipsRetSchema.safeParse({
+      items: ret,
+      hasNextChunk: ret.length === limit
     });
-
     if (!parsedRet.success) {
-      console.error("invalid in getSubscribesSF", parsedRet.error);
-      throw new Error("invalid in getSubscribesSF");
+      console.error("invalid ret: ", parsedRet.error);
+      throw new Error("invalid ret");
     }
-
+    
     return parsedRet.data;
-  } catch(error) {
-    console.error("SWW in getSubscribesSF", error);
-    throw new Error("Failed to get subscribes.");
+  } catch (error) {
+    console.error('Failed to fetch trend slips', error);
+    throw new Error('Failed to fetch trend slips');
   }
 };
 
-// chunked serires: get slips start
-// chunked serires: get slips: search
+// chunked serires: get slips: simple search
 const GetSlipsSimReqSchema = z.object({
   searchType: z.literal("simple"),
   search: z.string().max(COMMON.SEARCH_MAX),
@@ -699,29 +586,6 @@ export type GetSlipsDetReq = z.infer<typeof GetSlipsDetReqSchema>;
 
 export type GetSlipsReq = GetSlipsSimReq | GetSlipsDetReq;
 
-const GetSlipsResSchema = z.object({
-  ...PageSchema.pick({
-    page_id: true,
-    user_id: true,
-
-    title: true,
-    preview: true,
-
-    view: true,
-    like: true,
-  }).shape,
-  profile_image_url: UserSchema.shape.profile_image_url,
-  created_at: DateStringRetSchema,
-  tag_ids: TagsSchema
-});
-export type GetSlipsRes = z.infer<typeof GetSlipsResSchema>;
-
-const GetSlipsRetSchema = CSSchema.merge(z.object({
-  items: z.array(GetSlipsResSchema)
-}));
-export type GetSlipsRet = z.infer<typeof GetSlipsRetSchema>;
-
-// chunked serires: get slips: simple search
 const GetSlipsSimParamSchema = CQSchema.merge(GetSlipsSimReqSchema);
 export type GetSlipsSimParam = z.infer<typeof GetSlipsSimParamSchema>;
 export const getSlipsSimSF = async (param: GetSlipsSimParam): Promise<GetSlipsRet> => {
@@ -971,7 +835,29 @@ export const getSlipsAutSimSF = async (param: GetSlipsAutSimParam): Promise<GetS
     let ret;
 
     if (!search) {
-      ret = await sql`
+      ret = orderCritic === "rank"
+      ? await sql`
+        WITH user_pages AS (
+          SELECT p.page_id, p.title, p.preview, p.view, p."like", p.created_at::TIMESTAMP AS created_at, p.user_id,
+            COALESCE((SELECT array_agg(pt.tag_id) FROM pages_tags pt WHERE pt.page_id = p.page_id), ARRAY[]::TEXT[]) AS tag_ids
+          FROM pages p
+          WHERE p.user_id = ${authorId}
+        )
+        SELECT COUNT(*)::int AS total_count, 
+          COALESCE(
+            (SELECT json_agg(result)
+              FROM (
+                SELECT up.page_id, up.title, up.preview, up.view, up."like", up.created_at, up.user_id, up.tag_ids
+                FROM user_pages up
+                ORDER BY up.view DESC, up.page_id ASC
+                OFFSET ${offset}
+                LIMIT ${limit}
+              ) result
+            ),
+            '[]'::json
+          ) AS results
+        FROM user_pages
+      `: await sql`
         WITH user_pages AS (
           SELECT p.page_id, p.title, p.preview, p.view, p."like", p.created_at::TIMESTAMP AS created_at, p.user_id,
             COALESCE((SELECT array_agg(pt.tag_id) FROM pages_tags pt WHERE pt.page_id = p.page_id), ARRAY[]::TEXT[]) AS tag_ids
@@ -1594,18 +1480,11 @@ export const increasePageViewSF = async (param: IncreasePageViewParam): Promise<
 
     const validParam = parsedParam.data;
 
-    await Promise.all([sql`
+    await sql`
       UPDATE pages
       SET view = view + 1
       WHERE page_id = ${validParam}
-    `,
-    sql`
-      INSERT INTO weekly_pages (page_id, view)
-        VALUES (${validParam}, 1)
-        ON CONFLICT (page_id)
-        DO UPDATE SET view = weekly_pages.view + 1
-    `]);
-
+    `;
   } catch (error) {
     console.error("SWW: ", error);
   }

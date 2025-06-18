@@ -1,11 +1,5 @@
-import type { Metadata } from 'next';
-
 import { Logo } from '@/app/components/leaves/Logos';
 import { LoginForm } from "@/app/components/login/LoginForm"; 
-
-export const metadata: Metadata = {
-  title: 'Login'
-};
 
 const LoginPage = () => {
   return (

@@ -2,21 +2,24 @@ import { memo } from "react";
 import Image from 'next/image';
 import Link from "next/link";
 
-import { type GetSlipsRes } from "@/app/lib/SFs/publicSFs";
-import { HorScrollDiv } from "@/app/components/leaves/HorScrollDiv";
+import { type GetSlipsRes } from "@/app/lib/utils";
+import { HorScrollDiv } from "@/app/components/divs/HorScrollDiv";
 import { ViewOnSvg, LikeSvg } from '@/app/lib/svgs';
 
 import { DEFAULT } from "@/app/lib/constants";
 
-export type SlipProps = Pick<GetSlipsRes, 'page_id' | 'created_at' | 'title' | 'preview' | 'user_id'> & {
+export type SlipProps = Pick<GetSlipsRes, 'page_id' | 'title' | 'preview' | 'user_id'> & {
   profile_image_url?: string | null;
 
   view?: number;
   like?: number;
-  
-  tag_ids?: string[];
+  created_at?: string;
+  updated_at?: string;
+
+  tag_ids?: string[]
 
   showAuthorInfo?: boolean
+  showCreadtedAtOrUpdatedAt?: "created_at" | "updated_at"
 
   className?: string;
 }
@@ -29,28 +32,31 @@ export const Slip = memo(({
   view,
   like,
   created_at,
+  updated_at,
   user_id,
   profile_image_url,
   showAuthorInfo=true,
-  className
+  showCreadtedAtOrUpdatedAt="created_at",
+  className="h-[15rem]"
 }: SlipProps) => {
-  const showAuthorInfoConfirmed = showAuthorInfo && user_id && profile_image_url;
+  const showAuthorInfoConfirmed = showAuthorInfo && user_id && profile_image_url !== undefined;
+  const isShowingTagIds = tag_ids && tag_ids.length > 0;
 
   return (
-    <div className={`flex flex-col py-[1.5rem] ${className}`}>
-      <Link href={`/@${user_id}/${page_id}`} className="flex flex-col h-[10rem] py-[0.5rem]">
+    <div className={`flex flex-col ${className}`}>
+      <Link href={`/@${user_id}/${page_id}`} className='flex-1 flex flex-col py-[0.5rem]'>
           <p className='text-[1.3rem] truncate font-[500] py-[0.5rem]'>
             {title}
           </p>
-          <p className='line-clamp-2 break-words font-[300] text-sub py-[0.5rem]'>
+          <p className='line-clamp-2 break-words font-[300] text-sub'>
             {preview}
           </p>
       </Link>
 
-      {tag_ids &&
+      {isShowingTagIds &&
       <HorScrollDiv
         scrollSpeed={1}
-        className="flex flex-row items-center gap-[0.5rem] h-[4rem] py-[0.5rem] hide_scrollbar"
+        className="flex flex-row items-center gap-[0.5rem] h-[25%] py-[0.5rem] hide_scrollbar"
       >
           {tag_ids.map((tag_id) => (
           <Link
@@ -63,12 +69,13 @@ export const Slip = memo(({
           ))}
       </HorScrollDiv>}
       
-      <div className='flex flex-row justify-between items-center h-[3rem] py-[0.5rem]'>
-        
-        <div className='flex flex-row items-center h-full'>
-          {showAuthorInfoConfirmed &&
-          <>
-          <div className="relative w-auto h-full aspect-square">
+      {showAuthorInfoConfirmed &&
+      <HorScrollDiv
+        scrollSpeed={1}
+        className="h-[15%] py-[0.1rem] hide_scrollbar"
+      >
+        <Link href={`/@${user_id}`} className="flex flex-row items-center h-full">
+          <div className="relative w-auto h-[80%] aspect-square">
             <Image
               src={profile_image_url ?? DEFAULT.DEFAULT_PROFILE_IMAGE_URL}
               alt={`${user_id}'s profile image`}
@@ -78,29 +85,36 @@ export const Slip = memo(({
             />
           </div>
 
-          <Link href={`/@${user_id}`} className='px-[0.5rem]'>{user_id}</Link>
-          </>}
+          <div className='px-[0.5rem]'>
+            {user_id}
+          </div>
+        </Link>
+      </HorScrollDiv>}
+
+      <div className='self-end flex flex-row items-center h-[10%] text-sub py-[0.1rem]'>
+        <div className="
+          flex flex-row items-center px-[0.5rem]">
+          {showCreadtedAtOrUpdatedAt === "created_at"
+          ? created_at ?? '-' : updated_at ?? '-'}
         </div>
 
-        <div className='flex flex-row items-center h-full text-sub'>
-          <div className="flex flex-row items-center px-[0.5rem]">{created_at}</div>
-          {view !== undefined &&
-          <>
-          <span>·</span>
-          <div className="flex flex-row items-center h-full px-[0.5rem]">
-            <ViewOnSvg className="w-auto h-[60%] aspect-auto px-[0.2rem]"/>
-            <span>{view}</span>
-          </div>
-          </>}
-          {like !== undefined &&
-          <>
-            <span>·</span>
-            <div className="flex flex-row items-center h-full px-[0.5rem]">
-              <LikeSvg className="w-auto h-[60%] aspect-auto px-[0.2rem]"/>
-              <span>{like}</span>
-            </div>
-          </>}
+        {view !== undefined &&
+        <>
+        <span>·</span>
+        <div className="flex flex-row items-center gap-[0.2rem] h-full px-[0.5rem]">
+          <ViewOnSvg className="w-auto h-[80%] aspect-auto"/>
+          <span>{view}</span>
         </div>
+        </>}
+
+        {like !== undefined &&
+        <>
+          <span>·</span>
+          <div className="flex flex-row items-center gap-[0.2rem] h-full px-[0.5rem]">
+            <LikeSvg className="w-auto h-[80%] aspect-auto"/>
+            <span>{like}</span>
+          </div>
+        </>}
       </div>
   </div>
   )
@@ -112,76 +126,58 @@ export const Slip = memo(({
 
 
 
-type SlipsSkeletonProps = {
-    limit: number
+export type SlipSkeletonProps = {
     showAuthorInfo?: boolean
     className?: string
 }
 
-export const SlipsSkeleton = ({
-    limit,
+export const SlipSkeletion = ({
     showAuthorInfo=true,
     className
-}: SlipsSkeletonProps) => {
+}: SlipSkeletonProps) => {
   return (
     <div className={`flex flex-col ${className}`}>
-        {Array.from({ length: limit }).map((_, idx) => (
-        <div key={idx} className='flex flex-col \ py-[1.5rem]'>
-            <div className='h-[10rem] py-[0.5rem]'>
-                <div className='h-[35%]'>
-                <div className='max-w-[7rem] h-[80%] skeleton'></div>
-                </div>
+      <div className={`${showAuthorInfo ? "h-[50%]" : "h-[65%]"} py-[0.5rem]`}>
+          <div className='h-[35%] pt-[0.3rem]'>
+            <div className='max-w-[7rem] h-[100%] skeleton'></div>
+          </div>
 
-                <div className='h-[65%] py-[0.5rem]'>
-                <div className='h-[50%]'>
-                    <div className='w-full h-[80%] skeleton'></div>
-                </div>
-                <div className='h-[50%]'>
-                    <div className='w-full h-[80%] skeleton'></div>
-                </div>
-                </div>
+          <div className='h-[65%] py-[0.5rem]'>
+            <div className='h-[50%]'>
+                <div className='w-full h-[85%] skeleton'></div>
             </div>
-
-            <div className='flex flex-row items-center gap-[0.5rem] h-[4rem] py-[0.5rem] overflow-x-hidden'>
-                <div className='w-[2rem] h-[80%] token border-[0rem] skeleton'></div>
-                <div className='w-[6rem] h-[80%] token border-[0rem] skeleton'></div>
-                <div className='w-[3rem] h-[80%] token border-[0rem] skeleton'></div>
+            <div className='h-[50%]'>
+                <div className='w-[50%] h-[85%] skeleton'></div>
             </div>
+          </div>
+      </div>
 
-            <div className='flex flex-row justify-between items-center h-[3rem] py-[0.5rem]'>
-              <div className='flex flex-row items-center h-full'>
-                {showAuthorInfo &&
-                <>
-                <div className="w-auto h-full aspect-square skeleton rounded-full"></div>
-            
-                <div className='flex justify-center items-center h-full px-[0.5rem]'>
-                    <div className='w-[5rem] h-[60%] skeleton'></div>
-                </div></>}
-              </div>
+      <div className='flex flex-row items-center gap-[0.3rem] h-[25%] py-[0.5rem] overflow-x-hidden'>
+          <div className='w-[20%] max-w-[2rem] h-[80%] token border-[0rem] skeleton'></div>
+          <div className='w-[40%] max-w-[6rem] h-[80%] token border-[0rem] skeleton'></div>
+          <div className='w-[30%] max-w-[3rem] h-[80%] token border-[0rem] skeleton'></div>
+      </div>
 
-              <div className='flex flex-row items-center h-full'>
-                <div className="flex justify-center items-center h-full px-[0.5rem]">
-                    <div className='w-[8rem] h-[60%] skeleton'></div>
-                </div>
+      {showAuthorInfo &&
+      <div className="flex flex-row items-center gap-[0.5rem] h-[15%] py-[0.1rem]">
+        <div className="w-auto h-[80%] aspect-square rounded-full skeleton"></div>
+    
+        <div className='w-full max-w-[5rem] h-[60%] skeleton'></div>
+      </div>}
 
-                <div className="flex flex-row items-center h-full px-[0.5rem]">
-                    <div className="flex justify-center items-center h-full px-[0.2rem]">
-                    <div className="w-[2rem] h-[60%] px-[0.2rem] skeleton"></div>
-                    </div>
+      <div className='self-end flex flex-row items-center w-[50%] max-w-[10rem] h-[10%] py-[0.1rem]'>
+        <div className="flex-2 flex justify-center items-center h-full px-[0.2rem]">
+            <div className='w-full max-w-[8rem] h-[80%] skeleton'></div>
+        </div>
 
-                    <div className='w-[3rem] h-[60%] skeleton'></div>
-                </div>
+        <div className="flex-1 flex flex-row items-center h-full px-[0.2rem]">
+            <div className='w-full max-w-[5rem] h-[80%] skeleton'></div>
+        </div>
 
-                <div className="flex flex-row items-center h-full px-[0.5rem]">
-                    <div className="flex justify-center items-center h-full px-[0.2rem]">
-                    <div className="w-[2rem] h-[60%] px-[0.2rem] skeleton"></div>
-                    </div>
-
-                    <div className='w-[3rem] h-[60%] skeleton'></div>
-                </div>
-              </div>
-            </div>
-        </div>))}
+        <div className="flex-1 flex flex-row items-center h-full px-[0.2rem]">
+            <div className='w-full max-w-[3rem] h-[80%] skeleton'></div>
+        </div>
+      </div>
     </div>
   )
 }

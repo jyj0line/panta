@@ -1,7 +1,10 @@
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Change Password'
+  title: {
+    template: '%s | Panta',
+    default: 'Change Password'
+  }
 };
 
 const ChangepasswordLayout = ({

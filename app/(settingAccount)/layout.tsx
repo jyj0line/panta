@@ -1,6 +1,15 @@
+import { type Metadata } from "next";
+
 import { getAuthenticatedUserASF } from '@/app/lib/SFs/afterAuthSFs';
 import { StickyDiv } from '@/app/components/divs/StickyDiv';
-import { Header } from '../components/common/Header';
+import { Header } from '@/app/components/common/Header';
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Panta',
+    default: 'Setting: Account'
+  }
+};
 
 const SettingLayout = async ({
   children,

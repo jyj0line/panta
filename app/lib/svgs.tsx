@@ -26,6 +26,7 @@ import DetailedSearchSvg from "@/public/detailedSearch.svg"
 import InfiniteScrollSvg from "@/public/infiniteScroll.svg"
 import PaginationSvg from "@/public/pagination.svg"
 import LikeSvg from "@/public/like.svg"
+import SubscribeSvg from "@/public/subscribe.svg";
 import ViewOnSvg from "@/public/viewOn.svg"
 import ViewOffSvg from "@/public/viewOff.svg"
 import CheckBoxOnSvg from "@/public/checkBoxOn.svg"
@@ -45,6 +46,6 @@ export {
     ArrowDropupSvg, ArrowDropdownSvg, DescSvg, AscSvg,
     FirstLeftSvg, LeftSvg, RightSvg, LastRightSvg,
     SimpleSearchSvg, DetailedSearchSvg, InfiniteScrollSvg, PaginationSvg,
-    LikeSvg, ViewOnSvg, ViewOffSvg, CheckBoxOnSvg, CheckBoxOffSvg, SelectImageSvg, TagSvg,
+    LikeSvg, SubscribeSvg, ViewOnSvg, ViewOffSvg, CheckBoxOnSvg, CheckBoxOffSvg, SelectImageSvg, TagSvg,
     EmptySvg, EndSvg, ErrorSvg, NotFoundSvg
 }

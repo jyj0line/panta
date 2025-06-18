@@ -86,7 +86,7 @@ export const WritePageForm = ({
                 setTokens={setTag_ids}
                 placeholder={"tag"}
                 className='bg-wh'
-                tokensClassName='gap-[0.5rem] p-[0.5rem]'
+                tokensClassName='gap-[0.5rem] p-[1rem]'
                 tokenClassName='token border-em'
                 inputClassName='textarea w-full'
             />

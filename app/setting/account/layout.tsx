@@ -1,7 +1,10 @@
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Setting: Account | Panta'
+  title: {
+    template: '%s | Panta',
+    default: 'Setting: Account'
+  }
 };
 
 const AccountLayout = ({

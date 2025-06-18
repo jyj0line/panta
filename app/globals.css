@@ -4,16 +4,16 @@
 
 @layer components {
     .container {
-        @apply w-full md:w-[750px] lg:w-[1010px] xl:w-[1260px] mx-auto;
+        @apply w-full min-[640px]:w-[620px] min-[768px]:w-[750px] min-[1024px]:w-[1010px] min-[1280px]:w-[1260px] mx-auto;
     }
     .little_container {
-        @apply w-full sm:w-[620px] md:w-[750px] lg:w-[1010px] mx-auto;
+        @apply w-full min-[640px]:w-[620px] min-[768px]:w-[750px] min-[1024px]:w-[1010px] mx-auto;
     }
     .small_container {
-        @apply w-full sm:w-[620px] md:w-[750px] mx-auto;
+        @apply w-full min-[640px]:w-[620px] min-[768px]:w-[750px] mx-auto;
     }
     .tiny_container {
-        @apply w-full sm:w-[620px] mx-auto;
+        @apply w-full min-[640px]:w-[620px] mx-auto;
     }
 
     .skeleton {
@@ -32,7 +32,7 @@
         @apply w-full bg-wh p-[1rem] rounded-[0.5rem] border-[0.1rem] border-supersub
     }
     .token {
-        @apply p-[0.4rem] rounded-[0.5rem] border-[0.1rem]
+        @apply p-[0.3rem] rounded-[0.5rem] border-[0.1rem]
     }
 
     .hide_scrollbar::-webkit-scrollbar {

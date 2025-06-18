@@ -1,52 +1,52 @@
 "use client";
 
 import { type GetSlipsBooRes, type GetSlipsBooReq, getSlipsBooSF } from '@/app/lib/SFs/publicSFs';
+import { type ClassNamesProps } from "@/app/lib/utils";
 import { InfiniteItems } from "@/app/components/common/InfiniteItems";
-import { type SlipProps, Slip, SlipsSkeleton } from '@/app/components/leaves/Slip';
+import { type SlipProps, type SlipSkeletonProps, Slip, SlipSkeletion } from '@/app/components/leaves/Slip';
 import { Empty, End, Error, DefaultEmpty } from '@/app/components/leaves/InformDataState';
-
-import { WORD_BLOCK, DESCRIPTION } from "@/app/lib/constants";
+import { DESCRIPTION, WORD_BLOCK } from '@/app/lib/constants';
 
 const LIMIT = 12;
 
 type InfiniteBooSlipsProps = {
   searchReq: GetSlipsBooReq
-  className?: string
-  itemContainerClassName?: string
-};
+} & ClassNamesProps;
 
-export const InfiniteBooSlips = ({ searchReq, className, itemContainerClassName }: InfiniteBooSlipsProps) => {
+export const InfiniteBooSlips = ({ searchReq, className, itemsContainerClassName, itemClassName }: InfiniteBooSlipsProps) => {
   return (
-    <InfiniteItems<GetSlipsBooReq, GetSlipsBooRes, Omit<SlipProps, keyof GetSlipsBooRes>>
+    <InfiniteItems<GetSlipsBooReq, GetSlipsBooRes, Omit<SlipProps, keyof GetSlipsBooRes>, SlipSkeletonProps>
       getItems={getSlipsBooSF}
       req={{ ...searchReq }}
       limit={LIMIT}
 
       isDefaultReq={true}
 
-      renderItem={(slip, additionalProps) => (
+      renderItem={(slip, additionalProps, itemClassName) => (
         <Slip
           key={slip.page_id} 
           {...slip}
           {...additionalProps}
+          className={`${additionalProps?.className ?? ''} ${itemClassName}`}
         />
       )}
-      additionalProps={{}}
+      additionalItemProps={{}}
 
-      LoadingComponent={SlipsSkeleton}
+      LoadingComponent={SlipSkeletion}
       EmptyComponent={Empty}
       ErrorComponent={Error}
       EndComponent={End}
       DefaultEmptyComponent={DefaultEmpty}
 
-      loadingProps={{ limit: LIMIT, showAuthorInfo: false, className: itemContainerClassName }}
+      loadingProps={{ showAuthorInfo: false }}
       emptyProps={{ heading: `No ${WORD_BLOCK.BOOK_PAGE_SLIPS_UPPER}`, para: `There are no ${WORD_BLOCK.BOOK_PAGE_SLIPS_LOWER}.` }}
       errorProps={{ heading: 'Error', para: 'Something went wrong.' }}
       endProps={{ heading: `All ${WORD_BLOCK.BOOK_PAGE_SLIPS_UPPER} loaded`, para: `There are no more ${WORD_BLOCK.BOOK_PAGE_SLIPS_LOWER}.` }}
       defaultEmptyProps={{ heading: DESCRIPTION.NO_BOOK_PAGES_YET, para: `` }}
 
       className={className}
-      itemContainerClassName={itemContainerClassName}
+      itemsContainerClassName={itemsContainerClassName}
+      itemClassName={itemClassName}
     />
   )
 };

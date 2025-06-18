@@ -25,8 +25,11 @@ export default {
         bad: 'var(--bad)',
         powerbad: 'var(--powerbad)'
       },
+      flex: {
+        '2': '2 2 0%'
+      },
       gridTemplateColumns: {
-        'card-grid': 'repeat(auto-fit, minmax(18rem, auto))',
+        'slips-grid': 'repeat(auto-fit, minmax(17rem, 1fr))',
         'books-grid': 'repeat(auto-fit, minmax(15rem, auto))'
       }, 
       keyframes: {
@@ -71,14 +74,7 @@ export default {
         'unmount-progressbar': {
           "0%": { width: "100%" },
           "100%": { width: "0%" },
-        },
-
-        'success': {
-          '0%, 100%': { transform: 'scale(1) rotate(0deg)' },
-          '50%': { transform: 'scale(1.1) ' },
-          '20%, 60%': { transform: 'rotate(5deg)' },
-          '40%, 80%': { transform: 'rotate(-5deg)' },
-        },
+        }
       },
       animation: {
         'opacity-loading': 'opacity-loading 1s linear 1s forwards',
@@ -89,10 +85,7 @@ export default {
         'spin-centered-imm': 'spin-centered 1s linear infinite',
 
         'opacity-unmount': 'opacity-unmount 5s linear forwards',
-        'unmount-progressbar': 'unmount-progressbar 5s linear forwards',
-
-        'success': 'success 0.5s ease-in 1',
-        'message': "message 5s linear forwards",
+        'unmount-progressbar': 'unmount-progressbar 5s linear forwards'
       },
     },
   },

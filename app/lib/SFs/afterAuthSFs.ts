@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt';
 import { auth } from '@/auth';
 import { sql, logoutSF } from "@/app/lib/SFs/publicSFs";
 import { type Page, UnhashedPasswordSchema, UserSchema, PageSchema, BookSchema, TagsSchema } from '@/app/lib/tables';
+import { type CQ, CQSchema, CSSchema, GetSlipsRetSchema, type GetSlipsRet, } from '@/app/lib/utils';
 import { METADATA, LOADING, SUCCESS, ERROR, COMMON } from '@/app/lib/constants';
 
 const {
@@ -39,7 +40,6 @@ const {
   SOMETHING_WENT_WRONG_ERROR,
   INVALID_INPUT_ERROR,
   UNAUTHENTICATED_ERROR,
-  FORBIDDEN_ERROR,
 
   INCORRECT_PASSWORD_ERROR,
   UNHASHED_PASSWORD_FOR_CONFIRM_DIFF_ERROR,
@@ -972,38 +972,177 @@ export const updateBookTitleASF = async (param: UpdateBookTitleParam): Promise<U
 }
 {/* write end */}
 
-
-const SubscribeParamSchema = UserSchema.shape.user_id;
-type SubscribeParam = z.infer<typeof SubscribeParamSchema>;
-const SubscribeRetSchema = z.boolean();
-export type SubscribeRet = z.infer<typeof SubscribeRetSchema>;
-export const subscribeToggleASF = async (param: SubscribeParam): Promise<SubscribeRet> => {
+{/* like series start */}
+// toggle like
+const IsLikingParamSchema = PageSchema.shape.page_id;
+type IsLikingParam = z.infer<typeof IsLikingParamSchema>;
+const IsLikingRetSchema = z.boolean();
+type IsLikingRet = z.infer<typeof IsLikingRetSchema>;
+export const isLikingASF = async (param: IsLikingParam): Promise<IsLikingRet> => {
   "use server";
 
   try {
-    const user = await getAuthenticatedUserASF();
-    if (!user) {
-      console.error(UNAUTHENTICATED_ERROR, user);
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
       return false;
     }
 
-    const parsedParam = SubscribeParamSchema.safeParse(param);
+    const parsedParam = IsLikingParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      return false;
+    }
+
+    const readerId = reader.user_id;
+    const pageId = parsedParam.data;
+
+    const ret = await sql`
+      SELECT EXISTS (
+        SELECT 1 
+        FROM likes 
+        WHERE page_id = ${pageId} AND user_id = ${readerId}
+      ) AS is_liking
+    `;
+
+    if (ret.length !== 1) {
+      console.error("invalid ret: ", ret);
+      return false;
+    }
+
+    const parsedRet = IsLikingRetSchema.safeParse(ret[0].is_liking);
+    if (!parsedRet.success) {
+      console.error("invalid ret: ", parsedRet.error);
+      return false;
+    }
+
+    return parsedRet.data;
+  } catch(_) {
+    return false;
+  }
+}
+
+// toggle like
+const ToggleLikeParamSchema = PageSchema.shape.page_id;
+type ToggleLikeParam = z.infer<typeof ToggleLikeParamSchema>;
+const ToggleLikeRetSchema = z.boolean().nullable();
+export type ToggleLikeRet = z.infer<typeof ToggleLikeRetSchema>;
+export const toggleLikeASF = async (param: ToggleLikeParam): Promise<ToggleLikeRet> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      console.error(UNAUTHENTICATED_ERROR, reader);
+      return null;
+    }
+
+    const parsedParam = ToggleLikeParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      return false;
+    }
+  
+    const readerId = reader.user_id;
+    const pageId = parsedParam.data;
+
+    await sql`
+      WITH del AS (
+        DELETE FROM likes 
+        WHERE page_id = ${pageId} AND user_id = ${readerId}
+        RETURNING user_id
+      )
+      INSERT INTO likes (page_id, user_id)
+      SELECT ${pageId}, ${readerId}
+      WHERE NOT EXISTS (SELECT 1 FROM del)
+    `;
+
+    return true;
+  } catch(error) {
+    console.error("SWW: ", error);
+    return false;
+  }
+}
+{/* like series end */}
+
+{/* subscribe start */}
+const IsSubscribingParamSchema = UserSchema.shape.user_id;
+type IsSubscribingParam = z.infer<typeof IsSubscribingParamSchema>;
+const IsSubscribingRetSchema = z.boolean();
+type IsSubscribingRet = z.infer<typeof IsSubscribingRetSchema>;
+export const isSubscribingASF = async (param: IsSubscribingParam): Promise<IsSubscribingRet> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      return false;
+    }
+
+    const parsedParam = IsSubscribingParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      return false;
+    }
+
+    const readerId = reader.user_id;
+    const authorId = parsedParam.data;
+
+    const ret = await sql`
+      SELECT EXISTS (
+        SELECT 1 
+        FROM subscribes 
+        WHERE user_id_subscribed = ${authorId} AND user_id_subscribing = ${readerId}
+      ) AS is_liking
+    `;
+
+    if (ret.length !== 1) {
+      console.error("invalid ret: ", ret);
+      return false;
+    }
+
+    const parsedRet = IsSubscribingRetSchema.safeParse(ret[0].is_liking);
+    if (!parsedRet.success) {
+      console.error("invalid ret: ", parsedRet.error);
+      return false;
+    }
+
+    return parsedRet.data;
+  } catch(_) {
+    return false;
+  }
+}
+
+const ToggleSubscribeParamSchema = UserSchema.shape.user_id;
+type ToggleSubscribeParam = z.infer<typeof ToggleSubscribeParamSchema>;
+const ToggleSubscribeRetSchema = z.boolean().nullable();
+export type ToggleSubscribeRet = z.infer<typeof ToggleSubscribeRetSchema>;
+export const toggleSubscribeASF = async (param: ToggleSubscribeParam): Promise<ToggleSubscribeRet> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      console.error(UNAUTHENTICATED_ERROR, reader);
+      return null;
+    }
+
+    const parsedParam = ToggleSubscribeParamSchema.safeParse(param);
     if (!parsedParam.success) {
       console.error("invalid param in subscribeASF", parsedParam.error);
       return false;
     }
   
     const authorId = parsedParam.data;
-    const userId = user.user_id;
+    const readerId = reader.user_id;
 
     await sql`
       WITH del AS (
         DELETE FROM subscribes 
-        WHERE user_id_subscribed = ${authorId} AND user_id_subscribing = ${userId}
+        WHERE user_id_subscribed = ${authorId} AND user_id_subscribing = ${readerId}
         RETURNING user_id_subscribed
       )
       INSERT INTO subscribes (user_id_subscribed, user_id_subscribing)
-      SELECT ${authorId}, ${userId}
+      SELECT ${authorId}, ${readerId}
       WHERE NOT EXISTS (SELECT 1 FROM del)
     `;
 
@@ -1014,7 +1153,177 @@ export const subscribeToggleASF = async (param: SubscribeParam): Promise<Subscri
   }
 }
 
+const GetSubscribesReqSchema = z.object({
+  authorId: UserSchema.shape.user_id,
+  edOrIng: z.enum(["subscribed", "subscribing"]),
+});
+export type GetSubscribesReq = z.infer<typeof GetSubscribesReqSchema>;
+
+const GetSubscribesParamSchema = CQSchema.merge(GetSubscribesReqSchema);
+export type GetSubscribesParam = z.infer<typeof GetSubscribesParamSchema>;
+
+const GetSubscribeResSchema = z.object({
+  profile_image_url: UserSchema.shape.profile_image_url,
+  user_id: UserSchema.shape.user_id,
+  reader_is_subscribing: z.boolean(),
+  is_user: z.boolean()
+});
+export type GetSubscribeRes = z.infer<typeof GetSubscribeResSchema>;
+
+const GetSubscribesRetSchema = CSSchema.merge(z.object({
+  items: z.array(GetSubscribeResSchema)
+}));
+export type GetSubscribesRet = z.infer<typeof GetSubscribesRetSchema>;
+export const getSubscribesASF = async (param: GetSubscribesParam): Promise<GetSubscribesRet> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+
+    const parsedParam = GetSubscribesParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      throw new Error("invalid param: ");
+    }
+
+    const readerId = reader?.user_id ?? null;
+    const { authorId, edOrIng, chunk, limit } = parsedParam.data;
+    const offset = chunk * limit;
+
+    const ret = edOrIng === "subscribing"
+    ? await sql`
+      WITH subscribing_users AS (
+        SELECT u.user_id, u.profile_image_url, 
+        CASE 
+          WHEN reader_sub.user_id_subscribing IS NOT NULL THEN true
+          ELSE false
+        END AS reader_is_subscribing,
+        CASE
+          WHEN u.user_id = ${readerId} THEN true
+          ELSE false
+        END AS is_user
+        FROM users u
+        INNER JOIN subscribes user_sub ON user_sub.user_id_subscribing = ${authorId}
+          AND u.user_id = user_sub.user_id_subscribed
+        LEFT JOIN subscribes reader_sub ON reader_sub.user_id_subscribing = ${readerId}
+        AND u.user_id = reader_sub.user_id_subscribed
+        ORDER BY u.wrote_at DESC, u.user_id
+      )
+      SELECT COUNT(*)::int AS total_count,
+        COALESCE(
+          (SELECT json_agg(result)
+            FROM (
+              SELECT *
+              FROM subscribing_users
+              OFFSET ${offset}
+              LIMIT ${limit}
+            ) result
+          ),
+          '[]'::json
+        ) AS results
+      FROM subscribing_users
+    ` : await sql `
+      WITH subscribed_users AS (
+        SELECT u.user_id, u.profile_image_url, 
+        CASE 
+          WHEN reader_sub.user_id_subscribing IS NOT NULL THEN true
+          ELSE false
+        END AS reader_is_subscribing,
+        CASE
+          WHEN u.user_id = ${readerId} THEN true
+          ELSE false
+        END AS is_user
+        FROM users u
+        INNER JOIN subscribes user_sub ON user_sub.user_id_subscribed = ${authorId}
+          AND u.user_id = user_sub.user_id_subscribing
+        LEFT JOIN subscribes reader_sub ON reader_sub.user_id_subscribing = ${readerId}
+        AND u.user_id = reader_sub.user_id_subscribed
+        ORDER BY u.wrote_at DESC, u.user_id
+      )
+      SELECT COUNT(*)::int AS total_count,
+        COALESCE(
+          (SELECT json_agg(result)
+            FROM (
+              SELECT *
+              FROM subscribed_users
+              OFFSET ${offset}
+              LIMIT ${limit}
+            ) result
+          ),
+          '[]'::json
+        ) AS results
+      FROM subscribed_users
+    `;
+    
+    const parsedRet = GetSubscribesRetSchema.safeParse({
+      items: ret[0].results,
+      totalCount: ret[0].total_count,
+      hasNextChunk: offset + ret[0].results.length < ret[0].total_count
+    });
+    
+    if (!parsedRet.success) {
+      console.error("invalid ret: ", parsedRet.error);
+      throw new Error("invalid ret: ");
+    }
+
+    return parsedRet.data;
+  } catch(error) {
+    console.error("SWW: ", error);
+    throw new Error("Failed to get subscribes.");
+  }
+};
+{/* subscribe end */}
+
 {/* is author series start */}
+// is author series: is author
+const IsAuthorParamSchema = UserSchema.shape.user_id;
+type IsAuthorParam = z.infer<typeof IsAuthorParamSchema>;
+const IsAuthorRetSchema = z.boolean();
+export type IsAuthorRet = z.infer<typeof IsAuthorRetSchema>;
+export const isAuthorASF = async (param: IsAuthorParam): Promise<IsAuthorRet> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      return false;
+    }
+
+    const parsedParam = IsAuthorParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      return false;
+    }
+  
+    const readerId = reader.user_id;
+    const authorId = parsedParam.data;
+
+    const ret = await sql`
+      SELECT EXISTS (
+        SELECT 1 
+        FROM users 
+        WHERE user_id = ${authorId} AND user_id = ${readerId}
+      ) AS is_author
+    `;
+
+    if (ret.length !== 1) {
+      console.error("invalid ret length: ", ret);
+      return false;
+    }
+
+    const parsedRet = IsAuthorRetSchema.safeParse(ret[0].is_author);
+    if (!parsedRet.success) {
+      console.error("invalid ret: ", ret);
+      return false;
+    }
+
+    return parsedRet.data;
+  } catch(error) {
+    console.error("SWW: ", error);
+    return false;
+  }
+}
+
 // is author series: is book author
 const IsBooAuthorParamSchema = BookSchema.shape.book_id;
 type IsBooAuthorParam = z.infer<typeof IsBooAuthorParamSchema>;
@@ -1116,6 +1425,196 @@ export const isPagAuthorASF = async (param: IsPagAuthorParam): Promise<IsPagAuth
 }
 {/* is author series end */}
 
+{/* get slips series start */}
+// get subscribing slips
+export const getSubSlipsASF = async (param: CQ): Promise<GetSlipsRet> => {
+  'use server';
+  
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      console.error(UNAUTHENTICATED_ERROR, reader);
+      return {
+        items: [],
+        hasNextChunk: false
+      }
+    }
+    
+    const parseParam = CQSchema.safeParse(param);
+    if (!parseParam.success) {
+      console.error("invalid param: ", parseParam.error);
+      throw new Error("invalid param");
+    }
+
+    const readerId = reader.user_id;
+    const { chunk, limit } = parseParam.data;
+    const offset = chunk * limit;
+
+    const ret = await sql`
+      SELECT p.page_id, p.title, p.preview, p.view, p."like", p.updated_at::TEXT, u.user_id, u.profile_image_url,
+        COALESCE((SELECT array_agg(pt.tag_id) FROM pages_tags pt WHERE pt.page_id = p.page_id), ARRAY[]::TEXT[]) AS tag_ids
+      FROM pages p
+      JOIN subscribes s ON p.user_id = s.user_id_subscribed
+      JOIN users u ON p.user_id = u.user_id
+      WHERE s.user_id_subscribing = ${readerId}
+      ORDER BY p.updated_at DESC, p.page_id ASC
+      OFFSET ${offset}
+      LIMIT ${limit}
+    `;
+    
+    const parsedRet = GetSlipsRetSchema.safeParse({
+      items: ret,
+      hasNextChunk: ret.length === limit
+    });
+    if (!parsedRet.success) {
+      console.error("invalid ret: ", parsedRet.error);
+      throw new Error("invalid ret");
+    }
+    
+    return parsedRet.data;
+  } catch (error) {
+    console.error('Failed to fetch subscribing slips', error);
+    throw new Error('Failed to fetch subscribing slips');
+  }
+};
+
+// get like slips
+export const getLikSlipsASF = async (param: CQ): Promise<GetSlipsRet> => {
+  'use server';
+  
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      console.error(UNAUTHENTICATED_ERROR, reader);
+      return {
+        items: [],
+        hasNextChunk: false
+      }
+    }
+    
+    const parseParam = CQSchema.safeParse(param);
+    if (!parseParam.success) {
+      console.error("invalid param: ", parseParam.error);
+      throw new Error("invalid param");
+    }
+
+    const readerId = reader.user_id;
+    const { chunk, limit } = parseParam.data;
+    const offset = chunk * limit;
+
+    const ret = await sql`
+      SELECT p.page_id, p.title, p.preview, p.view, p."like", p.updated_at::TEXT, u.user_id, u.profile_image_url,
+        COALESCE((SELECT array_agg(pt.tag_id) FROM pages_tags pt WHERE pt.page_id = p.page_id), ARRAY[]::TEXT[]) AS tag_ids
+      FROM pages p
+      JOIN likes l ON p.page_id = l.page_id
+      JOIN users u ON p.user_id = u.user_id
+      WHERE l.user_id = ${readerId}
+      ORDER BY p.updated_at DESC, p.page_id ASC
+      OFFSET ${offset}
+      LIMIT ${limit}
+    `;
+    
+    const parsedRet = GetSlipsRetSchema.safeParse({
+      items: ret,
+      hasNextChunk: ret.length === limit
+    });
+    if (!parsedRet.success) {
+      console.error("invalid ret: ", parsedRet.error);
+      throw new Error("invalid ret");
+    }
+    
+    return parsedRet.data;
+  } catch (error) {
+    console.error('Failed to fetch like slips', error);
+    throw new Error('Failed to fetch like slips');
+  }
+};
+{/* get slips series end */}
+
+{/* is new series start */}
+// is new subscribing pages
+export const isNewSubASF = async (): Promise<boolean> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      return false;
+    }
+
+    const readerId = reader.user_id;
+
+    const res = await sql`
+      WITH uu AS (
+        UPDATE users
+        SET sub_visited_at = CURRENT_TIMESTAMP
+        WHERE user_id = ${readerId}
+        RETURNING (SELECT sub_visited_at FROM users WHERE user_id = ${readerId}) AS old_sub_visited_at
+      )
+      SELECT CASE 
+        WHEN EXISTS (
+          SELECT 1
+          FROM users u
+          JOIN subscribes s ON u.user_id = s.user_id_subscribing
+          JOIN pages p ON s.user_id_subscribed = p.user_id
+          WHERE u.user_id = ${readerId}
+          AND p.updated_at > (SELECT old_sub_visited_at FROM uu)
+        ) THEN true
+        ELSE false
+      END AS is_new_subscrbing_pages
+    `;
+
+    if (res[0].is_new_subscrbing_pages === true) return true;
+    return false;
+  } catch (error) {
+    console.error("SWW: ", error);
+    return false;
+  }
+}
+
+// is new like pages
+export const isNewLikASF = async (): Promise<boolean> => {
+  "use server";
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      return false;
+    }
+
+    const readerId = reader.user_id;
+
+    const res = await sql`
+      WITH uu AS (
+        UPDATE users
+        SET like_visited_at = CURRENT_TIMESTAMP
+        WHERE user_id = ${readerId}
+        RETURNING (SELECT like_visited_at FROM users WHERE user_id = ${readerId}) AS old_like_visited_at
+      )
+      SELECT CASE 
+        WHEN EXISTS (
+          SELECT 1
+          FROM users u
+          JOIN likes l ON u.user_id = l.user_id
+          JOIN pages p ON l.page_id = p.page_id
+          WHERE u.user_id = ${readerId}
+          AND p.updated_at > (SELECT old_like_visited_at FROM uu)
+        ) THEN true
+        ELSE false
+      END AS is_new_like_pages
+    `;
+    
+    if (res[0].is_new_like_pages === true) return true;
+    return false;
+  } catch (error) {
+    console.error("SWW: ", error);
+    return false;
+  }
+}
+{/* visited_at series end */}
+
+{/* delete series start */}
+// delete seires: delete book
 const DeleteBookAndInPagesParamSchema = BookSchema.shape.book_id;
 type DeleteBookAndInPagesParam = z.infer<typeof DeleteBookAndInPagesParamSchema>;
 const DeleteBookAndInPagesRetSchema = BookSchema.shape.book_id.nullable();
@@ -1184,6 +1683,74 @@ export const deleteBookAndInPagesASF = async (param: DeleteBookAndInPagesParam):
     return null;
   }
 }
+
+// delete seires: delete page
+const DeletePageParamSchema = PageSchema.shape.page_id;
+type DeletePageParam = z.infer<typeof DeletePageParamSchema>;
+const DeletePageRetSchema = PageSchema.shape.page_id.nullable();
+export type DeletePageRet = z.infer <typeof DeletePageRetSchema>;
+export const deletePageASF = async (param: DeletePageParam): Promise<DeletePageRet> => {
+  "use server";
+
+  let successFlag = false;
+
+  try {
+    const reader = await getAuthenticatedUserASF();
+    if (!reader) {
+      console.error(UNAUTHENTICATED_ERROR, reader);
+      return null;
+    }
+
+    const parsedParam = DeletePageParamSchema.safeParse(param);
+    if (!parsedParam.success) {
+      console.error("invalid param: ", parsedParam.error);
+      return null;
+    }
+  
+    const readerId = reader.user_id;
+    const pageId = parsedParam.data;
+
+    const ret = await sql`
+      DELETE
+      FROM pages
+      WHERE page_id = ${pageId}
+        AND user_id = ${readerId}
+      RETURNING page_id
+    `;
+
+    if (ret.length !== 1) {
+      console.error("invalid ret length: ", ret);
+      return null;
+    }
+
+    const parsedRet = DeletePageRetSchema.safeParse(ret[0].page_id);
+    if (!parsedRet.success) {
+      console.error("invalid ret: ", parsedRet.error);
+      return null;
+    }
+
+    successFlag = true;
+    revalidatePath(`/@${readerId}/${pageId}`);
+    redirect(`/@${readerId}`);
+  } catch(error) {
+    if (error instanceof Error &&
+      'digest' in error &&
+      typeof error.digest === 'string' &&
+      error.digest.startsWith('NEXT_REDIRECT')) {
+
+      throw error;
+    }
+
+    console.error("SWW: ", error);
+    
+    if (successFlag) {
+      return param;
+    }
+
+    return null;
+  }
+}
+{/* delete serires end */}
 {/* neon end */}
 
 {/* cloudinary start */}

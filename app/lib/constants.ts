@@ -138,7 +138,8 @@ export const SUCCESS = {
     CREATE_PAGE_SUCCESS: "You've created the page successfully.",
     UPDATE_PAGE_SUCCESS: "You've updated the page successfully.",
 
-    DELETE_BOOK_SUCCESS: "You've deleted the book successfully."
+    DELETE_BOOK_SUCCESS: "You've deleted the book successfully.",
+    DELETE_PAGE_SUCCESS: "You've deleted the page successfully."
 }
 
 export const ERROR = {
@@ -187,7 +188,8 @@ export const ERROR = {
     CREATE_WRITE_SOMETHING_ERROR: "Something went wrong while creating the page. Please try again later.",
     UPDATE_WRITE_SOMETHING_ERROR: "Something went wrong while updating the page. Please try again later.",
 
-    DELETE_BOOK_SOMETHING_ERROR: "Something went wrong while deleting the book."
+    DELETE_BOOK_SOMETHING_ERROR: "Something went wrong while deleting the book.",
+    DELETE_PAGE_SOMETHING_ERROR: "Something went wrong while deleting the page."
 }
 
 export const DESCRIPTION = {

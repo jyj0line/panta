@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from 'next/link';
 
-import { HorScrollDiv } from "@/app/components/leaves/HorScrollDiv";
+import { HorScrollDiv } from "@/app/components/divs/HorScrollDiv";
 
 import { DEFAULT } from "@/app/lib/constants";
 

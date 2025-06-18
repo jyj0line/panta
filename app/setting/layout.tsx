@@ -7,7 +7,10 @@ import { SCtxedUCtxedHeader } from "@/app/components/common/SCtxedUCtxedHeader";
 import { type Tab, Tabs } from '@/app/components/leaves/Tabs';
 
 export const metadata: Metadata = {
-  title: 'Setting: Profile'
+  title: {
+    template: '%s | Panta',
+    default: 'Setting'
+  }
 };
 
 const settingtTabs: Tab[] = [
@@ -24,14 +27,14 @@ const SettingLayout = ({
     <SessionProvider>
       <SessCtxedUserProvider>
         <div className='relative min-h-dvh'>
-          <StickyDiv>
+          <StickyDiv effect="shadow">
             <SCtxedUCtxedHeader
               showSearch={true}
               authorId={null}
               className="little_container h-[3rem] p-[0.5rem]"
               userMenuClassName="h-full"
             />
-            <Tabs tabs={settingtTabs} className="justify-around little_container h-[3rem]"/>
+            <Tabs initTabs={settingtTabs} className="justify-around little_container h-[3rem]"/>
           </StickyDiv>
 
           <div className="small_container">

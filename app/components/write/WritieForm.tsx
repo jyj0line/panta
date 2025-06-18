@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -9,7 +9,8 @@ import {
   createWriteASF,
   updateWriteASF
 } from "@/app/lib/SFs/afterAuthSFs";
-import { useToastBundleContext } from '@/app/lib/contexts/ToastBundleContext';
+import { TMUpdater } from '@/app/components/backgrounder/SearchTMUpdater';
+import { makeToastOrder, useToastBundleContext } from '@/app/lib/contexts/ToastBundleContext';
 import { type WriteMode, WriteModeSelector } from "@/app/components/write/WriteModeSelector";
 import { WritePageForm } from '@/app/components/write/WritePageForm';
 import { WriteBooksForm } from '@/app/components/write/WriteBooksForm';
@@ -48,6 +49,8 @@ export const WriteForm = ({ page, initBooks }: WriteFormProps) => {
 
   const [books, setBooks] = useState<SelectWriteBooksRet>(initBooks);
 
+  const tmUpdaterDependency = title ? `${title} | Panta` : `${WRITE_TITLE_METADATA} | Panta`;
+
   const handleSubmit = async (): Promise<void> => {
     if (isSubmitting) {
       alert(PLEASE_TRY_AGAIN_LATER_ERROR);
@@ -67,29 +70,17 @@ export const WriteForm = ({ page, initBooks }: WriteFormProps) => {
         });
 
         if (updateWriteRes.success) {
-          addToast({
-            message: updateWriteRes.message,
-            className: "bg-em",
-            progressbarClassName: "bg-powerem"
-          });
+          addToast(makeToastOrder(updateWriteRes.message, true));
         } else {
           const errors = updateWriteRes.errors;
           if (errors) {
             Object.values(errors).map((errs) => {
               errs.map(e => {
-                addToast({
-                  message: e,
-                  className: "bg-bad",
-                  progressbarClassName: "bg-powerbad"
-                })
+                addToast(makeToastOrder(e, false));
               })
             })
           } else {
-            addToast({
-              message: updateWriteRes.message,
-              className: "bg-bad",
-              progressbarClassName: "bg-powerbad"
-            })
+            addToast(makeToastOrder(updateWriteRes.message, false));
           }
         }
       } else {
@@ -103,45 +94,24 @@ export const WriteForm = ({ page, initBooks }: WriteFormProps) => {
 
         if (createWriteRes.success) {
           push(`/write?page_id=${createWriteRes.page_id}`);
-          addToast({
-            message: createWriteRes.message,
-            className: "bg-em",
-            progressbarClassName: "bg-powerem"
-          });
+          addToast(makeToastOrder(createWriteRes.message, true));
         } else {
           const errors = createWriteRes.errors;
           if (errors) {
             Object.values(errors).map((errs) => {
               errs.map(e => {
-                addToast({
-                  message: e,
-                  className: "bg-bad",
-                  progressbarClassName: "bg-powerbad"
-                })
-              })
-            })
+                addToast(makeToastOrder(e, false));
+            })})
           } else {
-            addToast({
-              message: createWriteRes.message,
-              className: "bg-bad",
-              progressbarClassName: "bg-powerbad"
-            })
+            addToast(makeToastOrder(createWriteRes.message, false));
           }
         }
       }
     } catch(_) {
       if (page.page_id) {
-        addToast({
-          message: UPDATE_WRITE_SOMETHING_ERROR,
-          className: "bg-bad",
-          progressbarClassName: "bg-powerbad"
-        });
+        addToast(makeToastOrder(UPDATE_WRITE_SOMETHING_ERROR, false));
       } else {
-        addToast({
-          message: CREATE_WRITE_SOMETHING_ERROR,
-          className: "bg-bad",
-          progressbarClassName: "bg-powerbad"
-        });
+        addToast(makeToastOrder(CREATE_WRITE_SOMETHING_ERROR, false));
       }
     } finally {
       setIsSubmitting(false);
@@ -155,10 +125,6 @@ export const WriteForm = ({ page, initBooks }: WriteFormProps) => {
       push(`/${page.user_id}`);
     }
   };
-
-  useEffect(() => {
-    document.title = title ? `${title} | Panta` : `${WRITE_TITLE_METADATA} | Panta`;
-  }, [title]);
 
   return (
     <div className={'small_container relative flex flex-col min-h-dvh p-[0.5rem] bg-wh'}>
@@ -207,7 +173,9 @@ export const WriteForm = ({ page, initBooks }: WriteFormProps) => {
         setBooks={setBooks}
         className="flex-1 self-center flex items-center w-full max-w-[30rem]"
       />}
-      {/* write form inputs start */}
+      {/* write form inputs end */}
+
+      <TMUpdater dependency={tmUpdaterDependency}/>
     </div>
   );
 }

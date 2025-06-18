@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 import { type GetAuthorCrumbDataRet } from '@/app/lib/SFs/publicSFs';
-import { type UnhashedPassword, UserSchema, UnhashedPasswordSchema } from "@/app/lib/tables";
-import { type Breadcrumb } from "@/app/components/leaves/Breadcrumbs";
+import { type UnhashedPassword, UserSchema, PageSchema, TagsSchema, UnhashedPasswordSchema, DateStringRetSchema } from "@/app/lib/tables";
+import { COMMON } from "@/app/lib/constants";
+import { type Breadcrumb } from "@/app/components/dynAuthorId/Breadcrumbs";
 
 
 import { ERROR } from "@/app/lib/constants";
@@ -13,9 +14,15 @@ const {
 export type SearchParamValue = string | string[] | undefined;
 export type SearchParams = { [key: string]: SearchParamValue };
 
+export type ClassNamesProps = {
+  className?: string;
+  itemsContainerClassName?: string;
+  itemClassName?: string
+};
+
 export const CQSchema = z.object({
   chunk: z.number().int().nonnegative(),
-  limit: z.number().int().min(1)
+  limit: z.number().int().min(1).max(COMMON.LIMIT_MAX),
 });
 export type CQ = z.infer<typeof CQSchema>;
 export const CSSchema = z.object({
@@ -24,7 +31,28 @@ export const CSSchema = z.object({
 });
 export type CS = z.infer<typeof CSSchema>;
 
+export const GetSlipsResSchema = z.object({
+  ...PageSchema.pick({
+    page_id: true,
+    user_id: true,
 
+    title: true,
+    preview: true,
+
+    view: true,
+    like: true,
+  }).shape,
+  profile_image_url: UserSchema.shape.profile_image_url,
+  created_at: DateStringRetSchema.optional(),
+  updated_at: DateStringRetSchema.optional(),
+  tag_ids: TagsSchema
+});
+export type GetSlipsRes = z.infer<typeof GetSlipsResSchema>;
+
+export const GetSlipsRetSchema = CSSchema.merge(z.object({
+  items: z.array(GetSlipsResSchema)
+}));
+export type GetSlipsRet = z.infer<typeof GetSlipsRetSchema>;
 
 
 export const validateUnhashedPassword = (unhashedPassword: UnhashedPassword): string[] => {
@@ -101,10 +129,10 @@ export const OrderCriticSchema = z.enum(
   { invalid_type_error: 'Please select an valid order critic.' }
 );
 export type OrderCritic = z.infer<typeof OrderCriticSchema>;
-export const parseSPVOrderCritic = (value: SearchParamValue): OrderCritic => {
+export const parseSPVOrderCritic = (value: SearchParamValue, defulatOrderCritic: OrderCritic = "rank"): OrderCritic => {
   const parsedValue = OrderCriticSchema.safeParse(value);
   if (parsedValue.success) return parsedValue.data;
-  return "rank"
+  return defulatOrderCritic;
 }
 
 export const ORDER_DIRECTIONS = ['asc', 'desc'] as const;

@@ -24,11 +24,18 @@ export const generateMetadata = async (
 
   if (!isExistentUserId) {
     return {
-      title: NOT_FOUND_TITLE_METADATA
+      title: {
+        template: '%s | Panta',
+        default: NOT_FOUND_TITLE_METADATA
+      }
     }
   }
+
   return {
-    title: `@${authorId}`
+    title: {
+      template: '%s | Panta',
+      default: `@${authorId}`
+    }
   }
 };
 
@@ -49,7 +56,7 @@ const DynAuthorIdLayout = async ({
 
   return(
     <div className='relative flex flex-col min-h-dvh'>
-      <StickyDiv>
+      <StickyDiv isStickyEffect={false}>
         <Header
           showSearch={true}
           authorId={authorId}

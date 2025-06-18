@@ -33,15 +33,15 @@ export const UserMenu = ({ user, isUserFirstLoading, className="h-[2rem]" }: Use
   if (!user) {
     return (
       <div className={`flex flex-row items-center gap-[0.5rem] ${className}`}>
-          <Link href='/login' className='flex justify-center items-center px-[0.8rem] py-[0.3rem] rounded-[0.5rem] bg-supersub'>Login</Link>
-          <Link href='/signup' className='flex justify-center items-center px-[0.8rem] py-[0.3rem] rounded-[0.5rem] bg-sub text-background'>Sign Up</Link>
+          <Link href='/login' className='flex justify-center items-center px-[0.7rem] py-[0.2rem] rounded-[0.5rem] bg-supersub'>Login</Link>
+          <Link href='/signup' className='flex justify-center items-center px-[0.7rem] py-[0.2rem] rounded-[0.5rem] bg-sub text-background'>Sign Up</Link>
       </div>
     );
   }
 
   return(
     <div className={`flex flex-row gap-[1rem] ${className}`}>
-      <Link href='/write' className='flex justify-center items-center h-full p-[1rem] border-[0.1rem] border-em rounded-full'>
+      <Link href='/write' className='flex justify-center items-center h-full p-[0.5rem] border-[0.1rem] border-em rounded-full'>
         Write
       </Link>
       
@@ -66,7 +66,7 @@ export const UserMenu = ({ user, isUserFirstLoading, className="h-[2rem]" }: Use
         {isVisible &&
         <div
           className='
-            absolute top-[110%] right-[0px] z-[10]
+            absolute top-[125%] right-[0px] z-[10]
             flex flex-col items-start
             min-w-max bg-wh border-[0.1rem] border-supersub
           '

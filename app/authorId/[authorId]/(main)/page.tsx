@@ -43,12 +43,14 @@ const AuthorIdDynamicPage = async ({
         p={p}
         searchReq={searchReq}
         className='w-full py-[1.5rem]'
-        itemContainerClassName='divide-y-[0.1rem] divide-y-superdupersub'
+        itemsContainerClassName='divide-y-[0.1rem] divide-y-superdupersub'
+        itemClassName="h-[17rem] py-[1rem]"
       />
       : <InfiniteAutSlips
         searchReq={searchReq}
         className='w-full py-[1.5rem]'
-        itemContainerClassName='divide-y-[0.1rem] divide-y-superdupersub'
+        itemsContainerClassName='divide-y-[0.1rem] divide-y-superdupersub'
+        itemClassName="h-[17rem] py-[1rem]"
       />}
     </div>
   )
@@ -60,7 +62,7 @@ const getAutSearchReqAndOrderCritic = (authorId: string, searchParams: SearchPar
   const tagIds = parseSPVToken(searchParams.tag);
   const createdAtFrom = parseSPVDate(searchParams.created_at_from);
   const createdAtTo = parseSPVDate(searchParams.created_at_to);
-  const orderCritic = parseSPVOrderCritic(searchParams.order);
+  const orderCritic = parseSPVOrderCritic(searchParams.order, "created_at");
 
   if ((tagIds.length !== 0) || createdAtFrom || createdAtTo) {
     return [{

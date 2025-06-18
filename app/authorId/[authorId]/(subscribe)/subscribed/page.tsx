@@ -1,7 +1,7 @@
-import { getAuthenticatedUserASF } from "@/app/lib/SFs/afterAuthSFs";
-import { type GetSubscribesReq, getAuthorCrumbDataSF } from "@/app/lib/SFs/publicSFs";
+import { getAuthenticatedUserASF, type GetSubscribesReq } from "@/app/lib/SFs/afterAuthSFs";
+import { getAuthorCrumbDataSF } from "@/app/lib/SFs/publicSFs";
 import { getSubscribeCrumbs } from "@/app/lib/utils";
-import { Breadcrumbs } from "@/app/components/leaves/Breadcrumbs";
+import { Breadcrumbs } from "@/app/components/dynAuthorId/Breadcrumbs";
 import { InfiniteSubscribes } from "@/app/components/dynAuthorId/InfiniteSubscribes";
 
 const ED_OR_ING: GetSubscribesReq["edOrIng"] = 'subscribed';
@@ -16,6 +16,7 @@ const SubscribedPage = async ({
     getAuthorCrumbDataSF(authorId),
     getAuthenticatedUserASF()
   ]);
+  const isLoggedIn = reader !== null;
  
   if (!authorCrumbDataState.success) {
     return (
@@ -36,9 +37,10 @@ const SubscribedPage = async ({
 
         <InfiniteSubscribes
           authorId={authorCrumbDataState.authorCrumbData.user_id}
-          readerId={reader?.user_id ?? null}
+          isLoggedIn={isLoggedIn}
           edOrIng={ED_OR_ING}
-          className="flex-1 gap-[0.5rem] p-[1rem]"
+          className="flex-1 gap-[0.5rem] py-[0.5rem]"
+          itemsContainerClassName="flex flex-col"
         />
     </div>
   )
