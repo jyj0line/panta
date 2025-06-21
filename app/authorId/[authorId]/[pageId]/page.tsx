@@ -1,7 +1,7 @@
 import { Page } from "@/app/components/dynAuthorId/Page";
 import { BooPageTurner, AutPageTurner } from "@/app/components/dynAuthorId/PageTurner";
-import { BubbleDiv } from "@/app/components/divs/BubbleDiv";
-import { StickyDiv } from '@/app/components/divs/StickyDiv';
+import { BubbleDiv } from "@/app/components/div/BubbleDiv";
+import { StickyDiv } from '@/app/components/div/StickyDiv';
 import { PageViewUpdater } from "@/app/components/backgrounder/PageViewUpdater";
 import { ClapPad } from "@/app/components/dynAuthorId/ClapPad";
 

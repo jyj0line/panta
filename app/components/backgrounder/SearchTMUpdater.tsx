@@ -1,6 +1,6 @@
 "use client";
 
-import { type DependencyList, useEffect } from "react";
+import { useEffect } from "react";
 
 type TMUpdaterProps = {
   dependency: unknown

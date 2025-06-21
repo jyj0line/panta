@@ -4,9 +4,9 @@ import { useState } from "react";
 import { usePathname, useRouter } from 'next/navigation';
 
 import { areSameArraies } from '@/app/lib/utils';
-import { TextInput } from '@/app/components/leaves/TextInput';
+import { TextInput } from '@/app/components/atomic/TextInput';
 import { type GivenToken, TokenInput } from '@/app/components/common/TokenInput';
-import { DateInput } from '@/app/components/leaves/DateInput';
+import { DateInput } from '@/app/components/atomic/DateInput';
 
 import { SEARCH_PARAMS, PLACEHOLDER } from "@/app/lib/constants";
 const SAME_SEARCH_ALERT = "same search requirements.";

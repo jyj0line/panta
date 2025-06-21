@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { useToggleVisibility } from '@/app/lib/hooks';
-import { TextInput } from '@/app/components/leaves/TextInput';
+import { TextInput } from '@/app/components/atomic/TextInput';
 import { TagSvg } from '@/app/lib/svgs';
 
 export type GivenToken = {

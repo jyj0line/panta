@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { User } from 'next-auth';
 
-import { logoutRedirectSF } from '@/app/lib/SFs/publicSFs';
+import { logoutRedirectSF } from '@/app/lib/SF/publicSFs';
 import { useToggleVisibility } from '@/app/lib/hooks';
 
 import { ArrowDropdownSvg } from '@/app/lib/svgs';
@@ -33,8 +33,19 @@ export const UserMenu = ({ user, isUserFirstLoading, className="h-[2rem]" }: Use
   if (!user) {
     return (
       <div className={`flex flex-row items-center gap-[0.5rem] ${className}`}>
-          <Link href='/login' className='flex justify-center items-center px-[0.7rem] py-[0.2rem] rounded-[0.5rem] bg-supersub'>Login</Link>
-          <Link href='/signup' className='flex justify-center items-center px-[0.7rem] py-[0.2rem] rounded-[0.5rem] bg-sub text-background'>Sign Up</Link>
+          <Link
+            href='/signup'
+            className='flex justify-center items-center px-[0.7rem] py-[0.2rem] rounded-[0.5rem] bg-sub text-background'
+          >
+            Sign Up
+          </Link>
+
+          <Link
+            href='/login'
+            className='flex justify-center items-center px-[0.7rem] py-[0.2rem] rounded-[0.5rem] bg-supersub'
+          >
+            Login
+          </Link>
       </div>
     );
   }

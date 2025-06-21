@@ -1,10 +1,10 @@
 "use client";
 
-import { getLikSlipsASF } from '@/app/lib/SFs/afterAuthSFs';
+import { getLikSlipsASF } from '@/app/lib/SF/afterAuthSFs';
 import { type ClassNamesProps, type GetSlipsRes } from "@/app/lib/utils";
 import { InfiniteItems } from "@/app/components/common/InfiniteItems";
-import { type SlipProps, type SlipSkeletonProps, Slip, SlipSkeletion } from '@/app/components/leaves/Slip';
-import { Empty, End, Error } from '@/app/components/leaves/InformDataState';
+import { type SlipProps, type SlipSkeletonProps, Slip, SlipSkeletion } from '@/app/components/atomic/Slip';
+import { Empty, End, Error } from '@/app/components/atomic/InformDataState';
 
 const LIMIT = 24;
 const TOTAL_LIMIT = 120;

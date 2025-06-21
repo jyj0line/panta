@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { z } from "zod";
 
-import { type InitBook, createBookASF, updateBookTitleASF } from "@/app/lib/SFs/afterAuthSFs";
+import { type InitBook, createBookASF, updateBookTitleASF } from "@/app/lib/SF/afterAuthSFs";
 import { BookSchema } from '@/app/lib/tables';
-import { useToastBundleContext, makeToastOrder } from '@/app/lib/contexts/ToastBundleContext';
-import { TextInput } from "@/app/components/leaves/TextInput";
-import { IngButton } from "@/app/components/leaves/IngButton";
+import { useToastBundleContext, makeToastOrder } from '@/app/lib/context/ToastBundleContext';
+import { TextInput } from "@/app/components/atomic/TextInput";
+import { IngButton } from "@/app/components/atomic/IngButton";
 import { BOOK, PLACEHOLDER } from '@/app/lib/constants';
 import { SaveSvg } from "@/app/lib/svgs";
 
@@ -60,6 +60,7 @@ export const BookTitleIE = ({
             setBookTitle('');
             addToast(makeToastOrder(`You've created the new book ${validNewBookTitle} successfully.`, true));
         } catch (e) {
+            console.error(e);
             addToast(makeToastOrder(`Something went wrong while creating a new book`, false));
         } finally {
             setIsBookSubmitting(false);
@@ -90,6 +91,7 @@ export const BookTitleIE = ({
             });
             addToast(makeToastOrder(`You've updated the new book ${validBookTitle} successfully.`, true));
         } catch (e) {
+            console.error(e);
             addToast(makeToastOrder(`Something went wrong while updating the book`, false));
         } finally {
             setIsBookSubmitting(false);

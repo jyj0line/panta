@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 
-import { genSignatureSF, updateProfileImageUrlASF, deleteProfileImageUrlASF, deleteProfileImageFileSF } from "@/app/lib/SFs/afterAuthSFs";
+import { genSignatureSF, updateProfileImageUrlASF, deleteProfileImageUrlASF, deleteProfileImageFileSF } from "@/app/lib/SF/afterAuthSFs";
 import { uploadImageCF } from "@/app/lib/publicCFs";
-import { useSCtxedUserContext } from "@/app/lib/contexts/SCtxedUserContext";
-import { useToastBundleContext, makeToastOrder } from "@/app/lib/contexts/ToastBundleContext";
-import { ProfileImageSelector } from "@/app/components/leaves/ProfileImageSelector";
-import { IngButton } from "@/app/components/leaves/IngButton";
+import { useSCtxedUserContext } from "@/app/lib/context/SCtxedUserContext";
+import { useToastBundleContext, makeToastOrder } from "@/app/lib/context/ToastBundleContext";
+import { ProfileImageSelector } from "@/app/components/atomic/ProfileImageSelector";
+import { IngButton } from "@/app/components/atomic/IngButton";
 
 import { SUCCESS, ERROR } from "@/app/lib/constants";
 const {
@@ -106,7 +106,8 @@ export const ProfileImageForm = ({ className="h-[10rem]" }: ProfileImageFormProp
             addToast(create_success_toast_order);
             setNewProfileImageFile(null);
             setNewPreviewUrl(null);
-        } catch (_) {
+        } catch (e) {
+            console.error(e);
             addToast(create_error_toast_order);
         } finally {
             setIsSubmitting(false);
@@ -153,7 +154,8 @@ export const ProfileImageForm = ({ className="h-[10rem]" }: ProfileImageFormProp
             addToast(change_success_toast_order);
             setNewProfileImageFile(null);
             setNewPreviewUrl(null);
-        } catch (_) {
+        } catch (e) {
+            console.error(e);
             addToast(change_error_toast_order);
         } finally {
             setIsSubmitting(false);
@@ -190,7 +192,8 @@ export const ProfileImageForm = ({ className="h-[10rem]" }: ProfileImageFormProp
             addToast(delete_success_toast_order);
             setNewProfileImageFile(null);
             setNewPreviewUrl(null);
-        } catch (_) {
+        } catch (e) {
+            console.error(e);
             addToast(delete_error_toast_order);
         } finally {
             setIsSubmitting(false);

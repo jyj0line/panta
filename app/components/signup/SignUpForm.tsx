@@ -4,19 +4,19 @@ import { useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSession } from "next-auth/react";
 
-import { genSignatureSF, updateProfileImageUrlASF } from '@/app/lib/SFs/afterAuthSFs';
-import { validateUserIdSF, signUpSF, loginSF } from '@/app/lib/SFs/publicSFs';
+import { genSignatureSF, updateProfileImageUrlASF } from '@/app/lib/SF/afterAuthSFs';
+import { validateUserIdSF, signUpSF, loginSF } from '@/app/lib/SF/publicSFs';
 import { uploadImageCF } from '@/app/lib/publicCFs';
 import { useSyncFunction, useAsyncFunction } from '@/app/lib/hooks';
 import { validateUnhashedPassword, validateUnhashedPasswordForConfirm, validateBio } from "@/app/lib/utils";
-import { TextInput } from '@/app/components/leaves/TextInput';
-import { PasswordInput } from '@/app/components/leaves/PasswordInput';
-import { CheckBox } from '@/app/components/leaves/CheckBox';
-import { ProfileImageSelector } from '@/app/components/leaves/ProfileImageSelector';
-import { ScrollTextareaInput } from '@/app/components/leaves/ScrollTextareaInput';
-import { PrefixedMessage } from '@/app/components/leaves/PrefixedMessage';
-import { IngButton } from '@/app/components/leaves/IngButton';
-import { SuccessScreen } from '@/app/components/leaves/SuccessScreen';
+import { TextInput } from '@/app/components/atomic/TextInput';
+import { PasswordInput } from '@/app/components/atomic/PasswordInput';
+import { CheckBox } from '@/app/components/atomic/CheckBox';
+import { ProfileImageSelector } from '@/app/components/atomic/ProfileImageSelector';
+import { ScrollTextareaInput } from '@/app/components/atomic/ScrollTextareaInput';
+import { PrefixedMessage } from '@/app/components/atomic/PrefixedMessage';
+import { IngButton } from '@/app/components/atomic/IngButton';
+import { SuccessScreen } from '@/app/components/atomic/SuccessScreen';
 
 import { SpinnerSvg } from '@/app/lib/svgs';
 import { ERROR, COMMON, USER, DESCRIPTION } from '@/app/lib/constants';
@@ -65,7 +65,7 @@ export const SignUpForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
-  const { data, status, update } = useSession();
+  const { status, update } = useSession();
   
   // form inputs
   const [userId, setUserId] = useState('');
@@ -223,7 +223,8 @@ export const SignUpForm = () => {
           message: UPDATE_PROFILE_IMAGE_SOMETHING
         };
       }
-    } catch (_) {
+    } catch (e) {
+      console.error(e);
     } finally {
       if (callIdRef.current === callId) {
         setSubmitRes(ret);
@@ -239,7 +240,7 @@ export const SignUpForm = () => {
         successMessage={submitRes?.isSignedUp.message}
         afterMessages={Object.entries(submitRes)
           .filter(([key, item]) => key !== 'isSignedUp' && item?.success === false)
-          .map(([_, item]) => item?.message) }
+          .map(([, item]) => item?.message) }
         className='min-h-full'
       />
     )

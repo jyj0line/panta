@@ -8,9 +8,9 @@ import {
   type SelectWriteBooksRet,
   createWriteASF,
   updateWriteASF
-} from "@/app/lib/SFs/afterAuthSFs";
+} from "@/app/lib/SF/afterAuthSFs";
 import { TMUpdater } from '@/app/components/backgrounder/SearchTMUpdater';
-import { makeToastOrder, useToastBundleContext } from '@/app/lib/contexts/ToastBundleContext';
+import { makeToastOrder, useToastBundleContext } from '@/app/lib/context/ToastBundleContext';
 import { type WriteMode, WriteModeSelector } from "@/app/components/write/WriteModeSelector";
 import { WritePageForm } from '@/app/components/write/WritePageForm';
 import { WriteBooksForm } from '@/app/components/write/WriteBooksForm';
@@ -107,7 +107,8 @@ export const WriteForm = ({ page, initBooks }: WriteFormProps) => {
           }
         }
       }
-    } catch(_) {
+    } catch(e) {
+      console.error(e);
       if (page.page_id) {
         addToast(makeToastOrder(UPDATE_WRITE_SOMETHING_ERROR, false));
       } else {

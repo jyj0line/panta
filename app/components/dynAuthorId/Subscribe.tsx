@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { type GetSubscribeRes } from "@/app/lib/SFs/afterAuthSFs";
+import { type GetSubscribeRes } from "@/app/lib/SF/afterAuthSFs";
 import { SubscribeButton } from "@/app/components/dynAuthorId/SubscribeButton";
 import { DEFAULT } from "@/app/lib/constants";
 

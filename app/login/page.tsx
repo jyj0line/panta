@@ -1,4 +1,4 @@
-import { Logo } from '@/app/components/leaves/Logos';
+import { Logo } from '@/app/components/atomic/Logos';
 import { LoginForm } from "@/app/components/login/LoginForm"; 
 
 const LoginPage = () => {

@@ -1,6 +1,6 @@
 import { SessionProvider } from "next-auth/react";
 
-import { Logo } from '@/app/components/leaves/Logos';
+import { Logo } from '@/app/components/atomic/Logos';
 import { SignUpForm } from "@/app/components/signup/SignUpForm";
 
 const SignupPage = () => {

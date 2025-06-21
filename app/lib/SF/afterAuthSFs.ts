@@ -8,7 +8,7 @@ import { z } from "zod";
 import bcrypt from 'bcrypt';
 
 import { auth } from '@/auth';
-import { sql, logoutSF } from "@/app/lib/SFs/publicSFs";
+import { sql, logoutSF } from "@/app/lib/SF/publicSFs";
 import { type Page, UnhashedPasswordSchema, UserSchema, PageSchema, BookSchema, TagsSchema } from '@/app/lib/tables';
 import { type CQ, CQSchema, CSSchema, GetSlipsRetSchema, type GetSlipsRet, } from '@/app/lib/utils';
 import { METADATA, LOADING, SUCCESS, ERROR, COMMON } from '@/app/lib/constants';
@@ -216,7 +216,8 @@ export const updatePwASF = async (param: UpdatePwParam): Promise<UpdatePwRet> =>
       success: true,
       message: CHANGE_PASSWORD_SUCCESS
     }
-  } catch(_) {
+  } catch(error) {
+    console.error(error);
     return ({
         success: false,
         message: SOMETHING_WENT_WRONG_ERROR
@@ -262,7 +263,8 @@ export const updateBioASF = async (bio: UpdateBioParam): Promise<UpdateBioState>
       success: true,
       message: UPDATE_BIO_SUCCESS
     }
-  } catch (_) {
+  } catch (error) {
+    console.error(error);
     return {
       success: false,
       message: UPDATE_BIO_SOMETHING_ERROR
@@ -308,7 +310,8 @@ export const updateProfileImageUrlASF = async (profileImageUrl: UpdateProfileIma
       success: true,
       message: UPDATE_PROFILE_IMAGE_URL_SUCCESS
     }
-  } catch (_) {
+  } catch (error) {
+    console.error(error);
     return {
       success: false,
       message: UPDATE_PROFILE_IMAGE_URL_SOMETHING_ERROR
@@ -341,7 +344,8 @@ export const deleteProfileImageUrlASF = async (): Promise<DeleteProfileImageUrlS
       success: true,
       message: DELETE_PROFILE_IMAGE_SUCCESS
     }
-  } catch (_) {
+  } catch (error) {
+    console.error(error);
     return {
       success: false,
       message: DELETE_PROFILE_IMAGE_SOMETHING_ERROR
@@ -350,13 +354,10 @@ export const deleteProfileImageUrlASF = async (): Promise<DeleteProfileImageUrlS
 }
 
 // delete user
-const DeleteUserParamSchema = z.object({
-  pw: UnhashedPasswordSchema,
-  isChecked: z.boolean().refine((v) => v === true, {
-    message: DELETE_ACCOUNT_UNCHECKED_ERROR,
-  }),
-});
-type DeleteUserParam = z.infer<typeof DeleteUserParamSchema>;
+type DeleteUserParam = {
+    pw: string;
+    isChecked: boolean;
+};
 const DeleteUserValidatedParamSchema = z.object({
   pw: UnhashedPasswordSchema,
   isChecked: z.literal(true, {
@@ -474,7 +475,8 @@ export const deleteUserASF = async (param: DeleteUserParam): Promise<DeleteUserR
       success: true,
       message: DELETE_ACCOUNT_SUCCESS
     }
-  } catch(_) {
+  } catch(error) {
+    console.error(error);
     return ({
       success: false,
       message: SOMETHING_WENT_WRONG_ERROR
@@ -630,7 +632,7 @@ const updateWroteAtHASF = async () => {
       UPDATE users SET wrote_at = CURRENT_TIMESTAMP
     `;
   } catch(error) {
-    console.error("SSW in updateWroteAtHASF");
+    console.error("SSW in updateWroteAtHASF", error);
   }
 }
 
@@ -1016,7 +1018,8 @@ export const isLikingASF = async (param: IsLikingParam): Promise<IsLikingRet> =>
     }
 
     return parsedRet.data;
-  } catch(_) {
+  } catch(error) {
+    console.error(error);
     return false;
   }
 }
@@ -1024,8 +1027,7 @@ export const isLikingASF = async (param: IsLikingParam): Promise<IsLikingRet> =>
 // toggle like
 const ToggleLikeParamSchema = PageSchema.shape.page_id;
 type ToggleLikeParam = z.infer<typeof ToggleLikeParamSchema>;
-const ToggleLikeRetSchema = z.boolean().nullable();
-export type ToggleLikeRet = z.infer<typeof ToggleLikeRetSchema>;
+export type ToggleLikeRet = boolean | null;
 export const toggleLikeASF = async (param: ToggleLikeParam): Promise<ToggleLikeRet> => {
   "use server";
 
@@ -1107,15 +1109,15 @@ export const isSubscribingASF = async (param: IsSubscribingParam): Promise<IsSub
     }
 
     return parsedRet.data;
-  } catch(_) {
+  } catch(error) {
+    console.error(error);
     return false;
   }
 }
 
 const ToggleSubscribeParamSchema = UserSchema.shape.user_id;
 type ToggleSubscribeParam = z.infer<typeof ToggleSubscribeParamSchema>;
-const ToggleSubscribeRetSchema = z.boolean().nullable();
-export type ToggleSubscribeRet = z.infer<typeof ToggleSubscribeRetSchema>;
+export type ToggleSubscribeRet = boolean | null;
 export const toggleSubscribeASF = async (param: ToggleSubscribeParam): Promise<ToggleSubscribeRet> => {
   "use server";
 
@@ -1800,11 +1802,12 @@ export const genSignatureSF = async (): Promise<GenSignatureRet> => {
         signature,
         ...params
       };
-    } catch (_) {
-        return {
-          success: false,
-          message: CREATE_PROFILE_IMAGE_SOMETHING_ERROR
-        }
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        message: CREATE_PROFILE_IMAGE_SOMETHING_ERROR
+      }
     }
 };
 
@@ -1838,7 +1841,8 @@ export const deleteProfileImageFileSF = async (): Promise<DeleteProfileImageFile
       success: true,
       message: DELETE_PROFILE_IMAGE_SUCCESS
     };
-  } catch (_) {
+  } catch (error) {
+    console.error(error);
     return {
       success: false,
       message: DELETE_PROFILE_IMAGE_SOMETHING_ERROR

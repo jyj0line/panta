@@ -1,11 +1,11 @@
 "use client";
 
-import { type GetSubscribesReq, type GetSubscribeRes, getSubscribesASF } from '@/app/lib/SFs/afterAuthSFs';
+import { type GetSubscribesReq, type GetSubscribeRes, getSubscribesASF } from '@/app/lib/SF/afterAuthSFs';
 import { type ClassNamesProps } from "@/app/lib/utils";
 import { type User } from "@/app/lib/tables";
 import { InfiniteItems } from "@/app/components/common/InfiniteItems";
 import { type SubscribeProps, Subscribe } from '@/app/components/dynAuthorId/Subscribe';
-import { Empty, Error, End } from '@/app/components/leaves/InformDataState';
+import { Empty, Error, End } from '@/app/components/atomic/InformDataState';
 import { SpinnerSvg } from '@/app/lib/svgs';
 
 const LIMIT = 24;

@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 
-import { updatePwASF } from "@/app/lib/SFs/afterAuthSFs";
-import { PasswordInput } from "@/app/components/leaves/PasswordInput";
-import { CheckBox } from "@/app/components/leaves/CheckBox";
-import { PrefixedMessage } from "@/app/components/leaves/PrefixedMessage";
-import { IngButton } from "@/app/components/leaves/IngButton";
-import { SuccessScreen } from "@/app/components/leaves/SuccessScreen";
+import { updatePwASF } from "@/app/lib/SF/afterAuthSFs";
+import { PasswordInput } from "@/app/components/atomic/PasswordInput";
+import { CheckBox } from "@/app/components/atomic/CheckBox";
+import { PrefixedMessage } from "@/app/components/atomic/PrefixedMessage";
+import { IngButton } from "@/app/components/atomic/IngButton";
+import { SuccessScreen } from "@/app/components/atomic/SuccessScreen";
 import { validateUnhashedPassword, validateUnhashedPasswordForConfirm } from "@/app/lib/utils";
 
 import { SUCCESS, ERROR, USER, DESCRIPTION } from '@/app/lib/constants';
@@ -65,7 +65,8 @@ export const ChangePasswordForm = () => {
 
             setChangingPwRes(updatePwRes.message);
             setIsPwChanged(true);
-        } catch(_) {
+        } catch(e) {
+            console.error(e);
             setChangingPwRes(SOMETHING_WENT_WRONG_ERROR);
             if (successFlag) setIsPwChanged(true);
         } finally {

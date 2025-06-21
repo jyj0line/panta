@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import {ToastBundleProvider} from "@/app/lib/contexts/ToastBundleContext";
+import {ToastBundleProvider} from "@/app/lib/context/ToastBundleContext";
 import { inter } from '@/app/lib/fonts';
 import "@/app/globals.css";
 

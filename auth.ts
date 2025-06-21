@@ -4,7 +4,7 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 
 import { authConfig } from '@/auth.config';
-import { getUserSF, selectProfileImageUrlSF, selectBioSF } from '@/app/lib/SFs/authSFs';
+import { getUserSF, selectProfileImageUrlSF, selectBioSF } from '@/app/lib/SF/authSFs';
 import { UserSchema, UnhashedPasswordSchema } from '@/app/lib/tables';
 
 const AuthrizeParamSchema = z.object({

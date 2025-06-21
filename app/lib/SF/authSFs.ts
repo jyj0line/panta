@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 
-import { sql } from "@/app/lib/SFs/publicSFs";
+import { sql } from "@/app/lib/SF/publicSFs";
 import { UserSchema } from '@/app/lib/tables';
 
 // get user
@@ -39,7 +39,8 @@ export const getUserSF = async(user_id: GetUserParam): Promise<GetUserRet | null
         profile_image_url: parsedUser.data.profile_image_url,
         bio: parsedUser.data.bio
       };
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       return null;
     }
 }
@@ -68,7 +69,8 @@ export const selectProfileImageUrlSF = async (userId: SelectProfileImageUrlParam
     if (!parsedProfileImageUrl.success) return null;
     
     return parsedProfileImageUrl.data;
-  } catch (_) {
+  } catch (error) {
+    console.error(error);
     return null;
   }
 }
@@ -97,7 +99,8 @@ export const selectBioSF = async (userId: SelectBioParam): Promise<SelectBioRet 
     if (!parsedBio.success) return null;
     
     return parsedBio.data;
-  } catch (_) {
+  } catch (error) {
+    console.error(error);
     return null;
   }
 }

@@ -36,18 +36,18 @@ export const NotLoggedIn = ({
             <div className="flex flex-row gap-[1rem]">
                 <button
                     type="button"
-                    onClick={handleLoginClick}
-                    className='flex justify-center items-center px-[1rem] py-[0.5rem] rounded-[0.5rem] bg-supersub'
-                >
-                    Login
-                </button>
-
-                <button
-                    type="button"
                     onClick={handleSignupClick}
                     className='flex justify-center items-center px-[1rem] py-[0.5rem] rounded-[0.5rem] bg-sub text-background'
                 >
                     Sign Up
+                </button>
+
+                <button
+                    type="button"
+                    onClick={handleLoginClick}
+                    className='flex justify-center items-center px-[1rem] py-[0.5rem] rounded-[0.5rem] bg-supersub'
+                >
+                    Login
                 </button>
             </div>
         </div>

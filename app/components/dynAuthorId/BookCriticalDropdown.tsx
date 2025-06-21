@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-import { deleteBookAndInPagesASF } from "@/app/lib/SFs/afterAuthSFs";
-import { useToastBundleContext, makeToastOrder } from "@/app/lib/contexts/ToastBundleContext";
+import { deleteBookAndInPagesASF } from "@/app/lib/SF/afterAuthSFs";
+import { useToastBundleContext, makeToastOrder } from "@/app/lib/context/ToastBundleContext";
 import { useToggleVisibility } from "@/app/lib/hooks";
-import { IngButton } from "@/app/components/leaves/IngButton";
+import { IngButton } from "@/app/components/atomic/IngButton";
 import { ArrowDropdownSvg, CriticalSvg } from "@/app/lib/svgs";
 
 import { SUCCESS, ERROR } from "@/app/lib/constants";

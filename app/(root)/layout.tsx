@@ -1,14 +1,15 @@
 import { type Metadata } from 'next';
 
-import { getAuthenticatedUserASF, isNewSubASF, isNewLikASF } from '@/app/lib/SFs/afterAuthSFs';
-import { StickyDiv } from '@/app/components/divs/StickyDiv';
+import { getAuthenticatedUserASF, isNewSubASF, isNewLikASF } from '@/app/lib/SF/afterAuthSFs';
+import { StickyDiv } from '@/app/components/div/StickyDiv';
 import { Header } from '@/app/components/common/Header';;
-import { Tabs } from '@/app/components/leaves/Tabs';
+import { Tabs } from '@/app/components/atomic/Tabs';
 
 export const metadata: Metadata = {
   title: {
     template: '%s | Panta',
-    default: 'Panta'
+    default: 'Root',
+    absolute: 'Panta'
   }
 };
 
@@ -33,7 +34,7 @@ const GroRootLayout = async ({
         <Header
           showSearch={true}
           authorId={null}
-          className="little_container h-[3rem] py-[0.5rem]"
+          className="little_container h-[3rem] p-[0.5rem]"
           userMenuProps={{
             user: reader?? null,
             isUserFirstLoading: false,
@@ -41,7 +42,7 @@ const GroRootLayout = async ({
           }}
         />
 
-        <Tabs initTabs={initTabs} className="little_container h-[3rem]"/>
+        <Tabs initTabs={initTabs} className="little_container h-[3.5rem] p-[0.5rem]"/>
       </StickyDiv>
 
       {children}

@@ -1,4 +1,4 @@
-import { getAuthenticatedUserASF, isAuthorASF, isLikingASF, isSubscribingASF } from "@/app/lib/SFs/afterAuthSFs";
+import { getAuthenticatedUserASF, isAuthorASF, isLikingASF, isSubscribingASF } from "@/app/lib/SF/afterAuthSFs";
 import { SubscribeButton } from "@/app/components/dynAuthorId/SubscribeButton";
 import { LikeButton } from "@/app/components/dynAuthorId/LikeButton";
 

@@ -1,4 +1,4 @@
-import { getAutTagsSF, type GetSlipsAutReq } from "@/app/lib/SFs/publicSFs";
+import { getAutTagsSF, type GetSlipsAutReq } from "@/app/lib/SF/publicSFs";
 import {
   type SearchParams,
   type OrderCritic,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { usePathname, useRouter } from 'next/navigation';
 
 import { useDebounce } from '@/app/lib/hooks';
-import { TextInput } from '@/app/components/leaves/TextInput';
+import { TextInput } from '@/app/components/atomic/TextInput';
 
 import { SEARCH_PARAMS, PLACEHOLDER } from "@/app/lib/constants";
 const DELAY = 500;

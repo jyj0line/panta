@@ -1,10 +1,10 @@
 "use client";
 
-import { type GetSlipsAutRes, type GetSlipsAutReq, unifiedGetSlipsAutSF } from '@/app/lib/SFs/publicSFs';
+import { type GetSlipsAutRes, type GetSlipsAutReq, unifiedGetSlipsAutSF } from '@/app/lib/SF/publicSFs';
 import { type ClassNamesProps } from '@/app/lib/utils';
 import { PaginationItems } from "@/app/components/common/PaginationItems";
-import { type SlipProps, type SlipSkeletonProps, Slip, SlipSkeletion } from '@/app/components/leaves/Slip';
-import { Empty, Error, DefaultEmpty } from '@/app/components/leaves/InformDataState';
+import { type SlipProps, type SlipSkeletonProps, Slip, SlipSkeletion } from '@/app/components/atomic/Slip';
+import { Empty, Error, DefaultEmpty } from '@/app/components/atomic/InformDataState';
 
 import { WORD_BLOCK, DESCRIPTION } from "@/app/lib/constants";
 

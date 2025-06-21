@@ -1,4 +1,4 @@
-import { getAuthenticatedUserASF } from "@/app/lib/SFs/afterAuthSFs";
+import { getAuthenticatedUserASF } from "@/app/lib/SF/afterAuthSFs";
 import { NotLoggedIn } from "@/app/components/groRoot/NotLoggedIn";
 import { InfiniteLikSlips } from "@/app/components/groRoot/InfiniteLikSlips";
 

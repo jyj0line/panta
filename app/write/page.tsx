@@ -8,7 +8,7 @@ import {
   getAuthenticatedUserASF,
   selectWritePageASF,
   selectWriteBooksASF
-} from '@/app/lib/SFs/afterAuthSFs';
+} from '@/app/lib/SF/afterAuthSFs';
 import { type SearchParams } from "@/app/lib/utils";
 import { WriteForm } from '@/app/components/write/WritieForm';
 import { parseSPVString } from '@/app/lib/utils';

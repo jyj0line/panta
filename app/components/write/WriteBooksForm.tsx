@@ -1,4 +1,4 @@
-import { type InitBook } from "@/app/lib/SFs/afterAuthSFs";
+import { type InitBook } from "@/app/lib/SF/afterAuthSFs";
 import { BookTitleIE } from '@/app/components/write/BookTitleIE';
 
 type WriteBooksFormProps = {

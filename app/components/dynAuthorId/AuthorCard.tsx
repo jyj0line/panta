@@ -3,8 +3,8 @@ import Link from "next/link";
 
 import { SubscribeButton } from '@/app/components/dynAuthorId/SubscribeButton';
 
-import { getAuthenticatedUserASF, isAuthorASF, isSubscribingASF } from '@/app/lib/SFs/afterAuthSFs';
-import { getAuthorCardDataSF } from "@/app/lib/SFs/publicSFs";
+import { getAuthenticatedUserASF, isAuthorASF, isSubscribingASF } from '@/app/lib/SF/afterAuthSFs';
+import { getAuthorCardDataSF } from "@/app/lib/SF/publicSFs";
 
 import { DEFAULT } from '@/app/lib/constants';
 const {

@@ -2,8 +2,8 @@ import { DefaultEmptySvg, EmptySvg, EndSvg, ErrorSvg } from '@/app/lib/svgs'
 
 const CONTAINER = "flex flex-col items-center gap-[1rem] p-[2rem]";
 const SVG= "w-auto h-[3rem] aspect-auto";
-const HEADING = "text-[1.5rem] font-[500]";
-const P = "text-[1.2rem] text-sub";
+const HEADING = "text-center text-[1.5rem] font-[500]";
+const P = "text-center text-[1.2rem] text-sub";
 
 export type InfromDataStateProps ={
   heading: string,

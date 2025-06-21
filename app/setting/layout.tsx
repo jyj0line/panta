@@ -1,10 +1,10 @@
 import { type Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 
-import { SessCtxedUserProvider } from '@/app/lib/contexts/SCtxedUserContext';
-import { StickyDiv } from "@/app/components/divs/StickyDiv";
+import { SessCtxedUserProvider } from '@/app/lib/context/SCtxedUserContext';
+import { StickyDiv } from "@/app/components/div/StickyDiv";
 import { SCtxedUCtxedHeader } from "@/app/components/common/SCtxedUCtxedHeader";
-import { type Tab, Tabs } from '@/app/components/leaves/Tabs';
+import { type Tab, Tabs } from '@/app/components/atomic/Tabs';
 
 export const metadata: Metadata = {
   title: {
@@ -34,7 +34,7 @@ const SettingLayout = ({
               className="little_container h-[3rem] p-[0.5rem]"
               userMenuClassName="h-full"
             />
-            <Tabs initTabs={settingtTabs} className="justify-around little_container h-[3rem]"/>
+            <Tabs initTabs={settingtTabs} className="justify-around little_container h-[3.5rem] p-[0.5rem]"/>
           </StickyDiv>
 
           <div className="small_container">

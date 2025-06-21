@@ -18,7 +18,6 @@ import {
 } from "@/app/lib/utils";
 
 import { type ErrorCode, ERROR_CODE, SUCCESS, ERROR, COMMON } from '@/app/lib/constants';
-import { redirect } from 'next/dist/server/api-utils';
 
 const {
   SIGN_UP_SUCCESS,
@@ -28,8 +27,6 @@ const {
   LOG_OUT_SUCCESS
 } = SUCCESS;
 const {
-  SOMETHING_WENT_WRONG_ERROR,
-
   USER_ID_SOMETHING_ERROR: USER_ID_SOMETHING,
   USER_ID_DUPLICATION_ERROR: USER_ID_DUPLICATION,
 
@@ -81,7 +78,8 @@ export const validateUserIdSF = async (user_id: ValidateUserIdParam): Promise<st
     }
 
     return [];
-  } catch (_) {
+  } catch (error) {
+    console.error(error);
     return [USER_ID_SOMETHING];
   }
 };
@@ -238,7 +236,8 @@ export const logoutSF = async (): Promise<LogoutState> => {
       success: true,
       message: LOG_OUT_SUCCESS
     }
-  } catch(_) {
+  } catch(error) {
+    console.error(error);
     return {
       success: false,
       message: LOG_OUT_SOMETHING_WENT_WRONG_ERROR
@@ -254,11 +253,16 @@ export const logoutRedirectSF = async (): Promise<LogoutRedirectState> => {
   
   try {
     await signOut({ redirectTo: '/' });
-  } catch(_) {
-    return { 
-      success: false,
-      message: SOMETHING_WENT_WRONG_ERROR
+  } catch(error) {
+    if (error instanceof Error &&
+      'digest' in error &&
+      typeof error.digest === 'string' &&
+      error.digest.startsWith('NEXT_REDIRECT')) {
+      throw error;
     }
+
+    console.error(error);
+    return;
   }
 };
 
@@ -278,21 +282,24 @@ export const isExistentUserIdSF = async (param: IsExistentUserIdParam): Promise<
     }
 
     const res = await sql`
-      SELECT user_id
-      FROM users
-      WHERE user_id = ${parsedParam.data}
-    `
+      SELECT EXISTS (
+        SELECT 1 
+        FROM users
+        WHERE user_id = ${parsedParam.data}
+      ) AS is_existent
+    `;
 
-    if (res.length === 0) {
+    if (res.length !== 1) {
       return false;
     }
 
-    if (res.length !== 1 || res[0].user_id !== parsedParam.data) {
+    const parsedRet = IsExistentUserIdRetSchema.safeParse(res[0].is_existent);
+    if (!parsedRet.success) {
       console.error("invalid ret in isExistentUserId", res);
       return false;
     }
 
-    return true;
+    return parsedRet.data;
   } catch(error) {
     console.error("Something went wrong in isExistentUserId", error);
     return false;
@@ -314,21 +321,24 @@ export const isExistentBookIdSF = async (param: IsExistentBookIdParam): Promise<
     }
 
     const res = await sql`
-      SELECT book_id
-      FROM books
-      WHERE book_id = ${parsedParam.data}
-    `
+      SELECT EXISTS (
+        SELECT 1 
+        FROM books
+        HERE book_id = ${parsedParam.data}
+      ) AS is_existent
+    `;
 
-    if (res.length === 0) {
+    if (res.length !== 1) {
       return false;
     }
 
-    if (res.length !== 1 || res[0].book_id !== parsedParam.data) {
+    const parsedRet = IsExistentBookIdRetSchema.safeParse(res[0].is_existent);
+    if (!parsedRet.success) {
       console.error("invalid ret in isExistentBookId", res);
       return false;
     }
 
-    return true;
+    return parsedRet.data;
   } catch(error) {
     console.error("Something went wrong in isExistentBookId", error);
     return false;
@@ -752,9 +762,9 @@ export const getSlipsDetSF = async (param: GetSlipsDetParam): Promise<GetSlipsRe
               SELECT fp.page_id, fp.title, fp.preview, fp.view, fp."like", fp.created_at, fp.tag_ids, fp.user_id, u.profile_image_url
               FROM filtered_pages fp
               JOIN users u ON fp.user_id = u.user_id
+              ORDER BY fp.created_at DESC, fp.page_id ASC
               OFFSET ${offset}
               LIMIT ${limit}
-              ORDER BY p.created_at DESC, p.page_id ASC
             ) result
           ),
           '[]'::json

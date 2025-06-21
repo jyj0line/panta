@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 import "@/app/globals.css";
 import { inter } from '@/app/lib/fonts';
-import { Error } from "@/app/components/leaves/Error";
+import { Error } from "@/app/components/atomic/Error";
 
 const GlobalError = ({
   error,

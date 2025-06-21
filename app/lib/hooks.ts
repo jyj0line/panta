@@ -6,7 +6,7 @@ import type { RefObject, SetStateAction } from 'react';
 import { type CQ, type CS } from '@/app/lib/utils';
 
 //useThrottle
-export const useThrottle = <T extends (...args: any[]) => void>(
+export const useThrottle = <T extends (...args: unknown[]) => void>(
   callback: T,
   delay: number
 ) => {
@@ -319,7 +319,7 @@ export const useInfiniteScroll = <TRequest extends Record<string, unknown>, TRes
         setTotalCount(res?.totalCount ?? null);
         setCurrentChunk(curChunk + 1);
       } catch (error) {
-        console.error(`SWW in selectItem ${cid})`);
+        console.error(`SWW in selectItem ${cid})`, error);
 
         if (cid !== cidRef.current) {
           return;
@@ -455,7 +455,7 @@ export const usePagination = <TRequest extends Record<string, unknown>, TRespons
       setItems(res.items);
       setTotalCount(res?.totalCount ?? null);
     } catch (error) {
-      console.error(`SWW in loadItem ${cid})`);
+      console.error(`SWW in loadItem ${cid})`, error);
       if (cid !== cidRef.current) {
         return;
       }

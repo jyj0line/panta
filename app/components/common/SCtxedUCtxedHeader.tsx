@@ -1,6 +1,6 @@
 "use client";
 
-import { useSCtxedUserContext } from '@/app/lib/contexts/SCtxedUserContext';
+import { useSCtxedUserContext } from '@/app/lib/context/SCtxedUserContext';
 import { type HeaderProps, Header } from '@/app/components/common/Header';
 
 export type SCtxedUCtxedHeaderProps = Omit<HeaderProps, 'userMenuProps'> & {

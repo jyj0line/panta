@@ -1,6 +1,6 @@
 import { type ClassNamesProps } from "@/app/lib/utils";
 import { type UseInfiniteScrollProps, useInfiniteScroll, useIntersectionObserver } from "@/app/lib/hooks";
-import { type InfromDataStateProps } from "@/app/components/leaves/InformDataState";
+import { type InfromDataStateProps } from "@/app/components/atomic/InformDataState";
 
 type InfiniteItemsProps<TRequest extends Record<string, unknown>, TResponse, TAdditionalProps extends Record<string, unknown>, TLoadingProps extends Record<string, unknown>> = {
   getItems: UseInfiniteScrollProps<TRequest, TResponse>['getItems'],

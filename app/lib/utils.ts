@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { type GetAuthorCrumbDataRet } from '@/app/lib/SFs/publicSFs';
+import { type GetAuthorCrumbDataRet } from '@/app/lib/SF/publicSFs';
 import { type UnhashedPassword, UserSchema, PageSchema, TagsSchema, UnhashedPasswordSchema, DateStringRetSchema } from "@/app/lib/tables";
 import { COMMON } from "@/app/lib/constants";
 import { type Breadcrumb } from "@/app/components/dynAuthorId/Breadcrumbs";

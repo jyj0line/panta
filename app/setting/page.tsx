@@ -1,6 +1,6 @@
 import { type Metadata } from "next";
 
-import { ToastBundleProvider } from "@/app/lib/contexts/ToastBundleContext";
+import { ToastBundleProvider } from "@/app/lib/context/ToastBundleContext";
 import { UserId } from "@/app/components/setting/UserId";
 import { ProfileImageForm } from "@/app/components/setting/ProfileImageForm";
 import { BioForm } from "@/app/components/setting/BioForm";

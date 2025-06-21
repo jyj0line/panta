@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 
-import { isExistentUserIdSF } from "@/app/lib/SFs/publicSFs";
+import { isExistentUserIdSF } from "@/app/lib/SF/publicSFs";
 import { AuthorCard } from "@/app/components/dynAuthorId/AuthorCard";
-import { Tabs } from '@/app/components/leaves/Tabs';
+import { Tabs } from '@/app/components/atomic/Tabs';
 
 const DynAutGroMainLayout = async ({
   params,

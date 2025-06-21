@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 
-import { type Toast, useToastBundleContext } from "@/app/lib/contexts/ToastBundleContext";
+import { type Toast, useToastBundleContext } from "@/app/lib/context/ToastBundleContext";
 import { CloseSvg, LeftSvg, RightSvg, ArrowDropdownSvg, ArrowDropupSvg } from "@/app/lib/svgs";
 
 const UNMOUNT_DELAY = 5000;

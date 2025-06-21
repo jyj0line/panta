@@ -1,7 +1,7 @@
 import { type Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getPageTitleSF } from "@/app/lib/SFs/publicSFs";
+import { getPageTitleSF } from "@/app/lib/SF/publicSFs";
 
 import { METADATA } from '@/app/lib/constants';
 

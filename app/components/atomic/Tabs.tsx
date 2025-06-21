@@ -48,7 +48,7 @@ export const Tabs = ({ initTabs, className="h-[3rem]" }: TabsProps) => {
       >
         <span className="relative">
           {id}
-          {hasUpdate && <span className="absolute -right-[5%] w-auto h-[20%] aspect-square bg-em rounded-full"></span>}
+          {hasUpdate && <span className="absolute -right-[0.5rem] w-auto h-[20%] aspect-square bg-em rounded-full"></span>}
         </span>
       </Link>
     ))}

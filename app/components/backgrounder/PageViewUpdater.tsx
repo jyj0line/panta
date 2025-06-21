@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { increasePageViewSF } from "@/app/lib/SFs/publicSFs";
+import { increasePageViewSF } from "@/app/lib/SF/publicSFs";
 import { type Page } from "@/app/lib/tables";
 
 type PageViewUpdaterProps = {

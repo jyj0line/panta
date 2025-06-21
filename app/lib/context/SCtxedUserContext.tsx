@@ -4,7 +4,7 @@ import { useState, createContext, useContext, useEffect, useRef } from 'react';
 import type { User } from 'next-auth';
 import { useSession } from "next-auth/react";
 
-import { getAuthenticatedUserASF } from '@/app/lib/SFs/afterAuthSFs';
+import { getAuthenticatedUserASF } from '@/app/lib/SF/afterAuthSFs';
 
 import { SKIP, SUCCESS, ERROR } from '@/app/lib/constants';
 const {
@@ -72,7 +72,8 @@ export const SessCtxedUserProvider = ({ children }: { children: React.ReactNode 
         success: true,
         message: UPDATE_INFO_SUCCESS
       }
-    } catch (_) {
+    } catch (e) {
+      console.error(e);
       if (cid !== cidRef.current) {
         return {
           success: true,
@@ -106,7 +107,8 @@ export const SessCtxedUserProvider = ({ children }: { children: React.ReactNode 
         success: true,
         message: REFRESH_INFO_SUCCESS
       }
-    } catch (_) {
+    } catch (e) {
+      console.error(e);
       if (cid !== cidRef.current) {
         return {
           success: true,
@@ -133,7 +135,8 @@ export const SessCtxedUserProvider = ({ children }: { children: React.ReactNode 
         }
 
         setUser(fetchedUser);
-      } catch (error) {
+      } catch (e) {
+        console.error(e);
         if (cid !== cidRef.current) {
           return;
         }

@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 
-import { useSCtxedUserContext } from "@/app/lib/contexts/SCtxedUserContext";
-import { deleteUserASF } from "@/app/lib/SFs/afterAuthSFs";
+import { useSCtxedUserContext } from "@/app/lib/context/SCtxedUserContext";
+import { deleteUserASF } from "@/app/lib/SF/afterAuthSFs";
 import { validateIsChecked } from "@/app/lib/utils";
-import { PasswordInput } from "@/app/components/leaves/PasswordInput";
-import { CheckBox } from "@/app/components/leaves/CheckBox";
-import { PrefixedMessage } from "@/app/components/leaves/PrefixedMessage";
-import { IngButton } from "@/app/components/leaves/IngButton";
-import { SuccessScreen } from "@/app/components/leaves/SuccessScreen";
+import { PasswordInput } from "@/app/components/atomic/PasswordInput";
+import { CheckBox } from "@/app/components/atomic/CheckBox";
+import { PrefixedMessage } from "@/app/components/atomic/PrefixedMessage";
+import { IngButton } from "@/app/components/atomic/IngButton";
+import { SuccessScreen } from "@/app/components/atomic/SuccessScreen";
 
 import { SUCCESS, ERROR, DESCRIPTION } from '@/app/lib/constants';
 const {
@@ -89,7 +89,8 @@ export const DeleteAccountForm = () => {
             setDeletingAccRes(deleteUserRes.message);
             setDeletingAccAfterMessages(writingDeletingAccAfterMessages);
             setIsAccDeleted(true);
-        } catch(_) {
+        } catch(e) {
+            console.error(e);
             setDeletingAccRes(SOMETHING_WENT_WRONG_ERROR);
             setDeletingAccAfterMessages(writingDeletingAccAfterMessages);
             if (successFlag) setIsAccDeleted(true);

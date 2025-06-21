@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { PrefixedMessage } from "@/app/components/leaves/PrefixedMessage";
+import { PrefixedMessage } from "@/app/components/atomic/PrefixedMessage";
 
 type SuccessScreenProps = {
   callbackUrl: string;

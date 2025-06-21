@@ -1,7 +1,7 @@
-import { type SelectWriteBooksRet } from "@/app/lib/SFs/afterAuthSFs";
-import { TextareaInput } from '@/app/components/leaves/TextareaInput';
+import { type SelectWriteBooksRet } from "@/app/lib/SF/afterAuthSFs";
+import { TextareaInput } from '@/app/components/atomic/TextareaInput';
 import { TokenInput } from '@/app/components/common/TokenInput';
-import { SelectInput } from '@/app/components/leaves/SelectInput';
+import { SelectInput } from '@/app/components/atomic/SelectInput';
 import { PAGE } from '@/app/lib/constants';
 
 type WritePageFormProps = {

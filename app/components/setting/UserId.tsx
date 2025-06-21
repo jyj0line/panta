@@ -1,6 +1,6 @@
 "use client";
 
-import { useSCtxedUserContext } from "@/app/lib/contexts/SCtxedUserContext";
+import { useSCtxedUserContext } from "@/app/lib/context/SCtxedUserContext";
 
 type UserIdProps = {
     className: string

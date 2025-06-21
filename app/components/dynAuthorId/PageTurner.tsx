@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
     type GetAutPageTurnerParam, type GetBooPageTurnerParam,
     getAutPageTurnerSF, getBooPageTurnerSF
-} from "@/app/lib/SFs/publicSFs";
+} from "@/app/lib/SF/publicSFs";
 import { LeftSvg, RightSvg } from "@/app/lib/svgs";
 import { DEFAULT } from "@/app/lib/constants";
 

@@ -2,8 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { isPagAuthorASF } from "@/app/lib/SFs/afterAuthSFs";
-import { type GetPageParam, getPageSF } from "@/app/lib/SFs/publicSFs";
+import { isPagAuthorASF } from "@/app/lib/SF/afterAuthSFs";
+import { type GetPageParam, getPageSF } from "@/app/lib/SF/publicSFs";
 import { PageCriticalDropdown } from "@/app/components/dynAuthorId/PageCriticalDropdown";
 import { BookSvg, ViewOnSvg, LikeSvg } from "@/app/lib/svgs";
 import { DEFAULT } from "@/app/lib/constants";
@@ -26,7 +26,7 @@ export const Page = async ({
   );
 
   const {
-    page_id, book_id, book_title, title, preview, tag_ids,
+    book_id, book_title, title, preview, tag_ids,
     user_id, profile_image_url, created_at, updated_at, view, like, content
   } = page;
 

@@ -1,4 +1,4 @@
-import { type GetSlipsReq } from '@/app/lib/SFs/publicSFs';
+import { type GetSlipsReq } from '@/app/lib/SF/publicSFs';
 import {
   type SearchParams,
   type OrderCritic,

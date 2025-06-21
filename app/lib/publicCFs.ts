@@ -1,4 +1,4 @@
-import type { GenSignatureSuccessRet } from "@/app/lib/SFs/afterAuthSFs";
+import type { GenSignatureSuccessRet } from "@/app/lib/SF/afterAuthSFs";
 
 import { SUCCESS, ERROR, COMMON } from "@/app/lib/constants";
 const {
@@ -44,7 +44,8 @@ export const uploadImageCF = async (file: File, genSignatureRes: GenSignatureSuc
       message: UPLOAD_PROFILE_IMAGE,
       secureUrl: typeof jsonedRes.secure_url === 'string' ? jsonedRes.secure_url : undefined
     }
-  } catch(_) {
+  } catch(error) {
+    console.error(error);
     return {
       success: false,
       message: UPLOAD_PROFILE_IMAGE_SOMETHING

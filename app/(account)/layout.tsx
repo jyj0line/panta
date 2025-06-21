@@ -1,7 +1,7 @@
 import { type Metadata } from "next";
 
-import { getAuthenticatedUserASF } from '@/app/lib/SFs/afterAuthSFs';
-import { StickyDiv } from '@/app/components/divs/StickyDiv';
+import { getAuthenticatedUserASF } from '@/app/lib/SF/afterAuthSFs';
+import { StickyDiv } from '@/app/components/div/StickyDiv';
 import { Header } from '@/app/components/common/Header';
 
 export const metadata: Metadata = {

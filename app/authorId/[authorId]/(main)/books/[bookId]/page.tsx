@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation';
 
-import { isBooAuthorASF } from '@/app/lib/SFs/afterAuthSFs';
-import { isExistentBookIdSF, getBookTitleSF } from '@/app/lib/SFs/publicSFs';
+import { isBooAuthorASF } from '@/app/lib/SF/afterAuthSFs';
+import { isExistentBookIdSF, getBookTitleSF } from '@/app/lib/SF/publicSFs';
 import { type SearchParams, parseSPVNaturalNumber, parseSPVOrderDirection } from '@/app/lib/utils';
 import { Breadcrumbs } from '@/app/components/dynAuthorId/Breadcrumbs';
 import { BookCriticalDropdown } from '@/app/components/dynAuthorId/BookCriticalDropdown';
-import { SlipsModeSelector } from '@/app/components/leaves/SlipsModeSelector';
+import { SlipsModeSelector } from '@/app/components/atomic/SlipsModeSelector';
 import { SlipsDirectionSelector } from '@/app/components/dynAuthorId/SlipsDirectionSelector';
 import { InfiniteBooSlips } from '@/app/components/dynAuthorId/InfiniteBooSlips';
 import { PaginationBooSlips } from '@/app/components/dynAuthorId/PaginationBooSlips';

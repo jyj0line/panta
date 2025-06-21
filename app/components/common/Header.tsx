@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-import { Logo, SmallLogo } from '@/app/components/leaves/Logos';
-import { type UserMenuProps, UserMenu } from '@/app/components/leaves/UserMenu';
+import { Logo, SmallLogo } from '@/app/components/atomic/Logos';
+import { type UserMenuProps, UserMenu } from '@/app/components/atomic/UserMenu';
 
 import { SimpleSearchSvg } from '@/app/lib/svgs';
 

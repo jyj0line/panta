@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ToastBundle } from '@/app/components/leaves/ToastBundle';
+import { ToastBundle } from '@/app/components/atomic/ToastBundle';
 
 export type ToastOrder = {
     message: string;

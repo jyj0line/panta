@@ -1,7 +1,7 @@
 import { type ClassNamesProps } from "@/app/lib/utils";
 import { type UsePaginationParam, usePagination } from "@/app/lib/hooks";
-import { Pagination, PaginationSkeleton } from "@/app/components/leaves/Pagination";
-import { type InfromDataStateProps } from "@/app/components/leaves/InformDataState";
+import { Pagination, PaginationSkeleton } from "@/app/components/atomic/Pagination";
+import { type InfromDataStateProps } from "@/app/components/atomic/InformDataState";
 import { SpinnerSvg } from "@/app/lib/svgs";
 
 type PaginationItemsProps<TRequest extends Record<string, unknown>, TResponse, TAdditionalProps, TLoadingProps extends Record<string, unknown>> = {

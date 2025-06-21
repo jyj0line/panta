@@ -1,9 +1,9 @@
 import { type Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getAuthenticatedUserASF } from '@/app/lib/SFs/afterAuthSFs';
-import { isExistentUserIdSF } from "@/app/lib/SFs/publicSFs";
-import { StickyDiv } from '@/app/components/divs/StickyDiv';
+import { getAuthenticatedUserASF } from '@/app/lib/SF/afterAuthSFs';
+import { isExistentUserIdSF } from "@/app/lib/SF/publicSFs";
+import { StickyDiv } from '@/app/components/div/StickyDiv';
 import { Header } from '@/app/components/common/Header';;
 
 import { METADATA } from '@/app/lib/constants';

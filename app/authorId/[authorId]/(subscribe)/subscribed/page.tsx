@@ -1,5 +1,5 @@
-import { getAuthenticatedUserASF, type GetSubscribesReq } from "@/app/lib/SFs/afterAuthSFs";
-import { getAuthorCrumbDataSF } from "@/app/lib/SFs/publicSFs";
+import { getAuthenticatedUserASF, type GetSubscribesReq } from "@/app/lib/SF/afterAuthSFs";
+import { getAuthorCrumbDataSF } from "@/app/lib/SF/publicSFs";
 import { getSubscribeCrumbs } from "@/app/lib/utils";
 import { Breadcrumbs } from "@/app/components/dynAuthorId/Breadcrumbs";
 import { InfiniteSubscribes } from "@/app/components/dynAuthorId/InfiniteSubscribes";

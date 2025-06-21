@@ -3,19 +3,12 @@
 import { useState, useActionState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { loginRedirectSF } from '@/app/lib/SFs/publicSFs';
-import { TextInput } from '@/app/components/leaves/TextInput';
-import { PasswordInput } from '@/app/components/leaves/PasswordInput';
-import { CheckBox } from '@/app/components/leaves/CheckBox';
-import { PrefixedMessage } from '@/app/components/leaves/PrefixedMessage';
-import { IngButton } from '@/app/components/leaves/IngButton';
-
-import { SpinnerSvg } from '@/app/lib/svgs';
-import { USER } from '@/app/lib/constants';
-const {
-  USER_ID_MAX,
-  USER_UNHASHED_PASSWORD_MAX
-} = USER;
+import { loginRedirectSF } from '@/app/lib/SF/publicSFs';
+import { TextInput } from '@/app/components/atomic/TextInput';
+import { PasswordInput } from '@/app/components/atomic/PasswordInput';
+import { CheckBox } from '@/app/components/atomic/CheckBox';
+import { PrefixedMessage } from '@/app/components/atomic/PrefixedMessage';
+import { IngButton } from '@/app/components/atomic/IngButton';
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();

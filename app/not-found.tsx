@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { type Metadata } from "next";
 */}
 
-import { NotFound } from "@/app/components/leaves/NotFound";
+import { NotFound } from "@/app/components/atomic/NotFound";
 
 import { METADATA } from '@/app/lib/constants';
 const {

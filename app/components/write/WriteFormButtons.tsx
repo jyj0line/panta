@@ -1,7 +1,7 @@
 "use client";
 
 import { useToggleVisibility } from '@/app/lib/hooks';
-import { IngButton } from '@/app/components/leaves/IngButton';
+import { IngButton } from '@/app/components/atomic/IngButton';
 import { SaveSvg, CloseSvg } from '@/app/lib/svgs';
 
 type WriteFormButtonsProps = {

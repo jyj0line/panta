@@ -93,7 +93,8 @@ export const ProfileImageSelector = ({
         onChange(validProfileimageFile);
         setNewPreviewUrl(newPreviewUrl);
       }
-    } catch (_) {
+    } catch (e) {
+      console.error(e);
       if (cid === cidRef.current) {
         alert(SELECT_PROFILE_IMAGE_SOMETHING_ERROR);
       }
@@ -104,7 +105,7 @@ export const ProfileImageSelector = ({
     }
   };
   
-  const handleRemove = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleRemove = () => {
     if (newProfileImageFileInputRef.current) {
       newProfileImageFileInputRef.current.value = '';
     }

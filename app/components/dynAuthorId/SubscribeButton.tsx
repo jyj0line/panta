@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
-import { toggleSubscribeASF } from "@/app/lib/SFs/afterAuthSFs";
+import { toggleSubscribeASF } from "@/app/lib/SF/afterAuthSFs";
 import { SubscribeSvg } from "@/app/lib/svgs";
 
 type SubscribeButtonType = "text" | "svg";
@@ -56,7 +56,8 @@ export const SubscribeButton = ({
                 return;
             }
             if (res === false) setIsSubscribing(prev => !prev);
-        } catch(_) {
+        } catch(e) {
+            console.error(e);
             setIsSubscribing(prev => !prev);
         }
     }

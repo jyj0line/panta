@@ -1,6 +1,6 @@
-import { getAutBooksSF } from "@/app/lib/SFs/publicSFs";
+import { getAutBooksSF } from "@/app/lib/SF/publicSFs";
 import { Book } from "@/app/components/dynAuthorId/Book";
-import { DefaultEmpty } from "@/app/components/leaves/InformDataState";
+import { DefaultEmpty } from "@/app/components/atomic/InformDataState";
 
 const DynAutBooksPage = async ({
   params

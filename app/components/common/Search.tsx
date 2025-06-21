@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 
-import { type GetSlipsReq, type GetSlipsAutReq } from "@/app/lib/SFs/publicSFs";
+import { type GetSlipsReq, type GetSlipsAutReq } from "@/app/lib/SF/publicSFs";
 import { type OrderCritic } from '@/app/lib/utils';
 import { SimpleSearch } from '@/app/components/common/SimpleSearch';
 import { DetailedSearch } from '@/app/components/common/DetailedSearch';
 import { type GivenToken } from '@/app/components/common/TokenInput';
-import { SlipsModeSelector } from '@/app/components/leaves/SlipsModeSelector';
-import { OrderCriticSelector } from '@/app/components/leaves/OrderCriticSelector';
+import { SlipsModeSelector } from '@/app/components/atomic/SlipsModeSelector';
+import { OrderCriticSelector } from '@/app/components/atomic/OrderCriticSelector';
 import { DetailedSearchSvg, ArrowDropdownSvg, ArrowDropupSvg } from "@/app/lib/svgs";
 
 export type GSearchReq = GetSlipsReq | GetSlipsAutReq;

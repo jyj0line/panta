@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 
-import { updateBioASF } from "@/app/lib/SFs/afterAuthSFs";
-import { useSCtxedUserContext } from "@/app/lib/contexts/SCtxedUserContext";
-import { useToastBundleContext, makeToastOrder } from "@/app/lib/contexts/ToastBundleContext";
-import { ScrollTextareaInput } from "@/app/components/leaves/ScrollTextareaInput";
-import { IngButton } from "@/app/components/leaves/IngButton";
+import { updateBioASF } from "@/app/lib/SF/afterAuthSFs";
+import { useSCtxedUserContext } from "@/app/lib/context/SCtxedUserContext";
+import { useToastBundleContext, makeToastOrder } from "@/app/lib/context/ToastBundleContext";
+import { ScrollTextareaInput } from "@/app/components/atomic/ScrollTextareaInput";
+import { IngButton } from "@/app/components/atomic/IngButton";
 
 import { USER, SUCCESS, ERROR } from '@/app/lib/constants';
 const {
@@ -22,14 +22,6 @@ const {
     USER_BIO_MAX
 } = USER;
 
-type SubmitRes = {
-    success: true;
-    message: string;
-} | {
-    success: boolean;
-    message: string;
-    error?: string[]
-};
 type BioFormProps = {
     className: string;
 }
@@ -64,7 +56,8 @@ export const BioForm = ({className}: BioFormProps) => {
             }
 
             addToast(makeToastOrder(UPDATE_BIO_SUCCESS, true));
-        } catch(_) {
+        } catch(e) {
+            console.error(e);
             addToast(makeToastOrder(UPDATE_BIO_SOMETHING_ERROR, false));
         } finally{
             setIsSubmitting(false);

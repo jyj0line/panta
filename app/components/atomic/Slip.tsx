@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from "next/link";
 
 import { type GetSlipsRes } from "@/app/lib/utils";
-import { HorScrollDiv } from "@/app/components/divs/HorScrollDiv";
+import { HorScrollDiv } from "@/app/components/div/HorScrollDiv";
 import { ViewOnSvg, LikeSvg } from '@/app/lib/svgs';
 
 import { DEFAULT } from "@/app/lib/constants";
@@ -121,7 +121,7 @@ export const Slip = memo(({
 }, (prevProps, nextProps) => {
   return prevProps.page_id === nextProps.page_id 
 });
-
+Slip.displayName = 'Slip';
 
 
 

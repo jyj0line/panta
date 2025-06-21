@@ -1,10 +1,10 @@
 "use client";
 
-import { type GetSlipsBooRes, type GetSlipsBooReq, getSlipsBooSF } from '@/app/lib/SFs/publicSFs';
+import { type GetSlipsBooRes, type GetSlipsBooReq, getSlipsBooSF } from '@/app/lib/SF/publicSFs';
 import { type ClassNamesProps } from "@/app/lib/utils";
 import { InfiniteItems } from "@/app/components/common/InfiniteItems";
-import { type SlipProps, type SlipSkeletonProps, Slip, SlipSkeletion } from '@/app/components/leaves/Slip';
-import { Empty, End, Error, DefaultEmpty } from '@/app/components/leaves/InformDataState';
+import { type SlipProps, type SlipSkeletonProps, Slip, SlipSkeletion } from '@/app/components/atomic/Slip';
+import { Empty, End, Error, DefaultEmpty } from '@/app/components/atomic/InformDataState';
 import { DESCRIPTION, WORD_BLOCK } from '@/app/lib/constants';
 
 const LIMIT = 12;

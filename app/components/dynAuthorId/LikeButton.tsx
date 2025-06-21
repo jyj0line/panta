@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
-import { toggleLikeASF } from "@/app/lib/SFs/afterAuthSFs";
+import { toggleLikeASF } from "@/app/lib/SF/afterAuthSFs";
 import { LikeSvg } from "@/app/lib/svgs";
 
 type LikeButtonProps = {
@@ -44,7 +44,8 @@ export const LikeButton = ({
                 return;
             }
             if (res === false) setIsLiking(prev => !prev);
-        } catch(_) {
+        } catch(e) {
+            console.error(e);
             setIsLiking(prev => !prev);
         }
     }
