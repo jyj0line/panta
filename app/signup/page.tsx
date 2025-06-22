@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SessionProvider } from "next-auth/react";
 
 import { Logo } from '@/app/components/atomic/Logos';
@@ -8,7 +9,9 @@ const SignupPage = () => {
     <main className='flex flex-col justify-center items-center min-h-dvh m-[2rem]'>
       <Logo className='h-[3rem] m-[1rem]'/>
       <SessionProvider>
-        <SignUpForm />
+        <Suspense>
+          <SignUpForm />
+        </Suspense>
       </SessionProvider>
     </main>
   )
