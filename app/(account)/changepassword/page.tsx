@@ -1,4 +1,4 @@
-import { ChangePasswordForm } from "@/app/components/groSettingAccount/ChangePasswordForm";
+import { ChangePasswordForm } from "@/app/components/groAccount/ChangePasswordForm";
 
 const ChangepasswordPage = () => {
   return (

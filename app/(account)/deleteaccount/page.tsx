@@ -1,4 +1,4 @@
-import { DeleteAccountForm } from "@/app/components/groSettingAccount/DeleteAccountForm";
+import { DeleteAccountForm } from "@/app/components/groAccount/DeleteAccountForm";
 
 const DeleteaccountPage = () => {
   return (
