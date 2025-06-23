@@ -8,9 +8,10 @@ export const metadata: Metadata = {
   title: {
     template: '%s | Panta',
     default: 'Panta',
+    absolute: 'Panta'
   },
   description: 'Page and Tag.',
-  //metadataBase: new URL('https://'),
+  metadataBase: new URL('https://panta-jyj0lines-projects.vercel.app'),
   applicationName: 'Panta',
 };
 
