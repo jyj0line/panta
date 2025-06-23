@@ -324,7 +324,7 @@ export const isExistentBookIdSF = async (param: IsExistentBookIdParam): Promise<
       SELECT EXISTS (
         SELECT 1 
         FROM books
-        HERE book_id = ${parsedParam.data}
+        WHERE book_id = ${parsedParam.data}
       ) AS is_existent
     `;
 

@@ -1337,7 +1337,6 @@ export const isBooAuthorASF = async (param: IsBooAuthorParam): Promise<IsBooAuth
   try {
     const reader = await getAuthenticatedUserASF();
     if (!reader) {
-      console.error(UNAUTHENTICATED_ERROR, reader);
       return false;
     }
 
