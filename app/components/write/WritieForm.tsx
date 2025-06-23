@@ -121,9 +121,9 @@ export const WriteForm = ({ page, initBooks }: WriteFormProps) => {
 
   const handleExit = (): void => {
     if (page.page_id) {
-      push(`/@${page.user_id}/${page.page_id}`);
+      push(`/${page.user_id}/${page.page_id}`);
     } else {
-      push(`/@${page.user_id}`);
+      push(`/${page.user_id}`);
     }
   };
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { genSignatureASF, updateProfileImageUrlASF, deleteProfileImageUrlASF, deleteProfileImageFileASF } from "@/app/lib/SF/afterAuthSFs";
+import { genSignatureSF, updateProfileImageUrlASF, deleteProfileImageUrlASF, deleteProfileImageFileSF } from "@/app/lib/SF/afterAuthSFs";
 import { uploadImageCF } from "@/app/lib/publicCFs";
 import { useSCtxedUserContext } from "@/app/lib/context/SCtxedUserContext";
 import { useToastBundleContext, makeToastOrder } from "@/app/lib/context/ToastBundleContext";
@@ -79,7 +79,7 @@ export const ProfileImageForm = ({ className="h-[10rem]" }: ProfileImageFormProp
     
         setIsSubmitting(true);
         try {
-            const signatureRes = await genSignatureASF();
+            const signatureRes = await genSignatureSF();
             if (!signatureRes.success) {
                 addToast(create_error_toast_order);
                 return;
@@ -122,7 +122,7 @@ export const ProfileImageForm = ({ className="h-[10rem]" }: ProfileImageFormProp
 
         setIsSubmitting(true);
         try {
-            const signatureRes = await genSignatureASF();
+            const signatureRes = await genSignatureSF();
             if (!signatureRes.success) {
                 addToast(change_error_toast_order);
                 return;
@@ -139,7 +139,7 @@ export const ProfileImageForm = ({ className="h-[10rem]" }: ProfileImageFormProp
                 return;
             }
             
-            const deleteImageFileRes = await deleteProfileImageFileASF();
+            const deleteImageFileRes = await deleteProfileImageFileSF();
             if (!deleteImageFileRes.success) {
                 addToast(change_error_toast_order);
                 return;
@@ -170,7 +170,7 @@ export const ProfileImageForm = ({ className="h-[10rem]" }: ProfileImageFormProp
     
         setIsSubmitting(true);
         try {
-            const deleteImageFileRes = await deleteProfileImageFileASF();
+            const deleteImageFileRes = await deleteProfileImageFileSF();
             if (!deleteImageFileRes.success) {
                 addToast(delete_error_toast_order);
                 return;

@@ -64,7 +64,6 @@ export const DeleteAccountForm = () => {
         };
         try {
             const deleteUserRes = await deleteUserASF({pw, isChecked});
-
             if (deleteUserRes.success) successFlag = true;
             if (!deleteUserRes.success) {
                 setDeletingAccRes(deleteUserRes.message);
@@ -80,9 +79,7 @@ export const DeleteAccountForm = () => {
             } else {
                 writingDeletingAccAfterMessages.logout = deleteUserRes.afterMessages[0];
             }
-
             const refreshSessionUserRes = await refreshSessionUser();
-
             if (refreshSessionUserRes.success) {
                 delete writingDeletingAccAfterMessages.refreshSessionUser;
             } else {
@@ -148,7 +145,7 @@ export const DeleteAccountForm = () => {
                     isOn={isChecked}
                     onClick={() => setIsChecked((prev) => !prev)}
                     onBlur={() => { const isCheckedRes = validateIsChecked(isChecked, [DELETE_ACCOUNT_UNCHECKED_ERROR]); setIsCheckedErrs(isCheckedRes); }}
-                    className='h-[1.5rem] text-left'
+                    className='h-[1.5rem]'
                     uncheckedErrClassName={`${isCheckedErrs.length > 0 ? "fill-bad" : ""}`}
                 />
 

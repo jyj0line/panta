@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSession } from "next-auth/react";
 
-import { genSignatureASF, updateProfileImageUrlASF } from '@/app/lib/SF/afterAuthSFs';
+import { genSignatureSF, updateProfileImageUrlASF } from '@/app/lib/SF/afterAuthSFs';
 import { validateUserIdSF, signUpSF, loginSF } from '@/app/lib/SF/publicSFs';
 import { uploadImageCF } from '@/app/lib/publicCFs';
 import { useSyncFunction, useAsyncFunction } from '@/app/lib/hooks';
@@ -200,7 +200,7 @@ export const SignUpForm = () => {
 
       if (!profileImage) return;
 
-      const signatureRes = await genSignatureASF();
+      const signatureRes = await genSignatureSF();
       if (callIdRef.current !== callId) return;
       ret.isProfileImageUploaded = signatureRes;
       if (!signatureRes.success) return;
