@@ -123,6 +123,7 @@ export const SessCtxedUserProvider = ({ children }: { children: React.ReactNode 
     }
   };
 
+
   useEffect(() => {
     const setUserOnMount = async () => {
       const cid = ++cidRef.current;

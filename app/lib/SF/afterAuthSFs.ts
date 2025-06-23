@@ -70,8 +70,13 @@ const {
 export const getAuthenticatedUserASF = async (): Promise<User | null> => {
   'use server';
 
-  const session = await auth();
-  return session?.user ?? null;
+  try {
+    const session = await auth();
+    return session?.user ?? null;
+  } catch(error) {
+    console.error("SWW: ", error);
+    return null;
+  }
 };
 
 {/* neon start */}
@@ -404,8 +409,9 @@ export const deleteUserASF = async (param: DeleteUserParam): Promise<DeleteUserR
       success: false,
       message: INVALID_INPUT_ERROR
     };
-
+    
     const parsedPw = DeleteUserValidatedParamSchema.shape.pw.safeParse(param.pw);
+
     if (!parsedPw.success) {
       invalidInputRet.errors = {
         ...invalidInputRet.errors,
@@ -423,6 +429,7 @@ export const deleteUserASF = async (param: DeleteUserParam): Promise<DeleteUserR
     }
 
     const parsedIsChecked = DeleteUserValidatedParamSchema.shape.isChecked.safeParse(param.isChecked);
+
     if (!parsedIsChecked.success) {
       invalidInputRet.errors = {
         ...invalidInputRet.errors,
@@ -443,8 +450,9 @@ export const deleteUserASF = async (param: DeleteUserParam): Promise<DeleteUserR
       FROM users
       WHERE user_id = ${user.user_id}
     `;
+
     if (selectProfileImageUrlRes[0].profile_image_url) {
-      const deleteProfileImageFileRes = await deleteProfileImageFileSF();
+      const deleteProfileImageFileRes = await deleteProfileImageFileASF();
       if (!deleteProfileImageFileRes.success) {
         console.error(`${selectProfileImageUrlRes[0].profile_image_url} has not been deleted.`);
       }
@@ -456,6 +464,7 @@ export const deleteUserASF = async (param: DeleteUserParam): Promise<DeleteUserR
       WHERE user_id = ${user.user_id}
       RETURNING user_id
     `;
+
     if (deleteUserRes[0].user_id !== user.user_id) {
       return {
         success: false,
@@ -464,6 +473,7 @@ export const deleteUserASF = async (param: DeleteUserParam): Promise<DeleteUserR
     } 
 
     const logoutRes = await logoutSF();
+
     if (!logoutRes.success) {
       return {
         success: true,
@@ -1770,7 +1780,7 @@ export type GenSignatureFailureRet = {
     message: string
 };
 export type GenSignatureRet = GenSignatureSuccessRet | GenSignatureFailureRet;
-export const genSignatureSF = async (): Promise<GenSignatureRet> => {
+export const genSignatureASF = async (): Promise<GenSignatureRet> => {
     "use server";
     
     try {
@@ -1814,7 +1824,7 @@ type DeleteProfileImageFileState = {
   success: boolean;
   message: string;
 };
-export const deleteProfileImageFileSF = async (): Promise<DeleteProfileImageFileState> => {
+export const deleteProfileImageFileASF = async (): Promise<DeleteProfileImageFileState> => {
   "use server";
     
   try {
