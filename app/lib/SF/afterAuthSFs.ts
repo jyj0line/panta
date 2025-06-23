@@ -1386,7 +1386,6 @@ export const isPagAuthorASF = async (param: IsPagAuthorParam): Promise<IsPagAuth
   try {
     const reader = await getAuthenticatedUserASF();
     if (!reader) {
-      console.error(UNAUTHENTICATED_ERROR, reader);
       return false;
     }
 
