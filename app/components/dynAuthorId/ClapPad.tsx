@@ -16,8 +16,8 @@ export const ClapPad = async ({
     const [isAuthor, isLoggedIn, isLikingInit, isSubscribingInit] = await Promise.all([
         isAuthorASF(authorId),
         getAuthenticatedUserASF().then(reader => reader !== null),
-        isSubscribingASF(authorId),
-        isLikingASF(pageId)
+        isLikingASF(pageId),
+        isSubscribingASF(authorId)
     ]);
 
     if (isAuthor) return null;
