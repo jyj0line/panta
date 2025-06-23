@@ -24,7 +24,7 @@ const SearchLayout = async ({
         <Header
           showSearch={true}
           authorId={null}
-          className="little_container h-[3rem] py-[0.5rem]"
+          className="little_container h-[3rem] p-[0.5rem]"
           userMenuProps={{
             user: user,
             isUserFirstLoading: false,
