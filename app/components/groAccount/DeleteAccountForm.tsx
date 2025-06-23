@@ -145,7 +145,7 @@ export const DeleteAccountForm = () => {
                     isOn={isChecked}
                     onClick={() => setIsChecked((prev) => !prev)}
                     onBlur={() => { const isCheckedRes = validateIsChecked(isChecked, [DELETE_ACCOUNT_UNCHECKED_ERROR]); setIsCheckedErrs(isCheckedRes); }}
-                    className='h-[1.5rem] text-left'
+                    className='h-[1.5rem]'
                     uncheckedErrClassName={`${isCheckedErrs.length > 0 ? "fill-bad" : ""}`}
                 />
 
