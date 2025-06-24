@@ -4,6 +4,8 @@ import { getAuthenticatedUserASF } from '@/app/lib/SF/afterAuthSFs';
 import { StickyDiv } from '@/app/components/div/StickyDiv';
 import { Header } from '../components/common/Header';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: {
     template: '%s | Panta',
@@ -24,7 +26,7 @@ const SearchLayout = async ({
         <Header
           showSearch={true}
           authorId={null}
-          className="little_container h-[3rem] py-[0.5rem]"
+          className="little_container h-[3rem] p-[0.5rem]"
           userMenuProps={{
             user: user,
             isUserFirstLoading: false,

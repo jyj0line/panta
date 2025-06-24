@@ -5,6 +5,8 @@ import { StickyDiv } from '@/app/components/div/StickyDiv';
 import { Header } from '@/app/components/common/Header';;
 import { Tabs } from '@/app/components/atomic/Tabs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: {
     template: '%s | Panta',
